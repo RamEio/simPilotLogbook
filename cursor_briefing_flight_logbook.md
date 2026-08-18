@@ -19,12 +19,12 @@
 
 | Couche | Techno choisie | Justification |
 |--------|---------------|---------------|
-| Framework | **Next.js 14 (App Router)** | Full-stack, API routes intégrées, déploiement Vercel gratuit |
+| Framework | **Next.js 14 (App Router)** | Full-stack, API routes intégrées |
 | Base de données | **SQLite via Prisma ORM** | Fichier unique, zéro config serveur, parfait pour < 50 users |
 | UI Components | **shadcn/ui + Tailwind CSS** | Modulaire, dark-mode natif, très personnalisable |
 | Icônes | **Lucide React** | Léger, cohérent |
 | Formulaires | **React Hook Form + Zod** | Validation simple et robuste |
-| Déploiement | **Vercel** (gratuit) | CI/CD automatique depuis GitHub |
+| Déploiement | **Apply.Build** | PaaS européen, deploy depuis GitHub (branche `deploiement-apply.build`) |
 
 ### Ce qu'on N'utilise PAS (volontairement)
 - ❌ Authentification complexe (pas de NextAuth, pas d'OAuth, pas de JWT)
@@ -492,3 +492,4 @@ DATABASE_URL="file:./dev.db"
 
 *Briefing rédigé pour Cursor — Projet Sim Pilot Logbook v1.0*
 *Stack : Next.js 14 + Prisma + SQLite + shadcn/ui + Tailwind CSS*
+*Déploiement : Apply.Build*

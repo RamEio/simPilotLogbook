@@ -155,6 +155,11 @@ const aircraftByGame: Record<Game, string[]> = {
 };
 
 async function main() {
+  const existing = await prisma.aircraft.count();
+  if (existing > 0) {
+    return;
+  }
+
   for (const game of Object.keys(aircraftByGame) as Game[]) {
     await prisma.aircraft.createMany({
       data: aircraftByGame[game].map((name) => ({

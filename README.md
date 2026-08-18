@@ -9,7 +9,7 @@ Usage interne, ambiance club — pas d'inscription publique, pas d'authentificat
 - Next.js 14 (App Router)
 - Prisma + SQLite
 - shadcn/ui + Tailwind CSS
-- Déploiement prévu : Vercel
+- Déploiement prévu : [Apply.Build](https://apply.build/)
 
 ## Démarrage local
 
@@ -22,6 +22,20 @@ npm run dev
 ```
 
 L'app tourne sur [http://localhost:3000](http://localhost:3000). Nom du produit : **Sim Pilot Logbook**.
+
+## Déploiement Apply.Build
+
+Branche Git : `deploiement-apply.build`.
+
+L'app est packagée en Docker (`Dockerfile`) pour Apply.Build, un PaaS européen qui déploie un conteneur depuis GitHub.
+
+1. Pousse cette branche (déjà prévue pour le premier déploiement).
+2. Connecte le repo [RamEio/simPilotLogbook](https://github.com/RamEio/simPilotLogbook) sur [apply.build](https://apply.build/).
+3. Choisis la branche `deploiement-apply.build` si le dashboard le demande.
+4. Ajoute la variable d'environnement `DATABASE_URL=file:/app/data/prod.db` si elle n'est pas déjà injectée par le Dockerfile.
+5. L'app sera joignable sur un sous-domaine `{app}.apps.apply.build`.
+
+SQLite vit dans le conteneur : un redéploiement peut réinitialiser les vols. Le seed des avions est idempotent.
 
 ## Spec produit
 
