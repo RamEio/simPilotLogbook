@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import type { Game, Outcome } from "@/lib/constants";
 import { FlightCard, type FlightCardData } from "@/components/flight-card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,8 @@ export default function FlightsPage() {
   const [sort, setSort] = useState("date");
   const [page, setPage] = useState(1);
   const [data, setData] = useState<FlightsResponse | null>(null);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     void apiFetch<Squadron[]>("/api/squadrons").then(setSquadrons);
@@ -57,13 +60,79 @@ export default function FlightsPage() {
     void apiFetch<FlightsResponse>(`/api/flights?${params.toString()}`).then(setData);
   }, [game, squadronId, pilotId, outcome, sort, page]);
 
+  async function onImport(file: File) {
+    setImporting(true);
+    try {
+      const form = new FormData();
+      form.set("file", file);
+      const response = await fetch("/api/flights/import", {
+        method: "POST",
+        body: form,
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; created?: number; skipped?: number }
+        | null;
+      if (!response.ok) {
+        throw new Error(payload?.error ?? "Import impossible");
+      }
+      toast.success(
+        `${payload?.created ?? 0} vol(s) importé(s)` +
+          (payload?.skipped ? `, ${payload.skipped} déjà présent(s)` : ""),
+      );
+      setPage(1);
+      const params = new URLSearchParams();
+      params.set("sort", sort);
+      params.set("page", "1");
+      const refreshed = await apiFetch<FlightsResponse>(`/api/flights?${params.toString()}`);
+      setData(refreshed);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Import impossible");
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  }
+
   return (
     <div className="space-y-6 fade-in">
-      <div>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink-muted">
-          Ops / Flights
-        </p>
-        <h1 className="mt-1 font-display text-2xl tracking-wider">Vols</h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink-muted">
+            Ops / Flights
+          </p>
+          <h1 className="mt-1 font-display text-2xl tracking-wider">Vols</h1>
+          <p className="mt-1 max-w-xl text-sm text-ink-secondary">
+            Exporte le carnet en CSV (à garder hors du serveur). Après un rebuild
+            Apply.Build, réimporte ce fichier pour restaurer les vols.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="secondary">
+            <a href="/api/flights/export">Exporter CSV</a>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={importing}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {importing ? "Import…" : "Importer CSV"}
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) {
+                void onImport(file);
+              }
+            }}
+          />
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">

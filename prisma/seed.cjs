@@ -1,9 +1,8 @@
-import { PrismaClient } from "@prisma/client";
-import { type Game } from "../src/lib/constants";
+const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
-const aircraftByGame: Record<Game, string[]> = {
+const aircraftByGame = {
   IL2_GB: [
     "Bf 109 F-4",
     "Bf 109 G-2",
@@ -160,7 +159,7 @@ async function main() {
     return;
   }
 
-  for (const game of Object.keys(aircraftByGame) as Game[]) {
+  for (const game of Object.keys(aircraftByGame)) {
     await prisma.aircraft.createMany({
       data: aircraftByGame[game].map((name) => ({
         name,
@@ -175,7 +174,7 @@ main()
   .then(async () => {
     await prisma.$disconnect();
   })
-  .catch(async (error: unknown) => {
+  .catch(async (error) => {
     console.error(error);
     await prisma.$disconnect();
     process.exit(1);

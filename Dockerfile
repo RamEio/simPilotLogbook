@@ -30,18 +30,19 @@ RUN apt-get update \
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV PORT=3000
+ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 ENV DATABASE_URL="file:/app/data/prod.db"
 
-COPY --from=builder /app/public ./public
+# Keep Next standalone node_modules intact; Prisma CLI lives under /opt.
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/src/lib/constants.ts ./src/lib/constants.ts
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/package-lock.json ./package-lock.json
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma/client ./node_modules/@prisma/client
+COPY --from=builder /app/node_modules /opt/node_modules
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
 
 RUN mkdir -p /app/data \
@@ -49,6 +50,6 @@ RUN mkdir -p /app/data \
   && chmod +x /app/docker-entrypoint.sh
 
 USER nextjs
-EXPOSE 3000
+EXPOSE 8080
 
 CMD ["./docker-entrypoint.sh"]
