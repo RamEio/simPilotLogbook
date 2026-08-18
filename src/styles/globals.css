@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0a0c0f;
+  --bg-secondary: #111418;
+  --bg-card: #161b22;
+  --bg-elevated: #1c2128;
+
+  --accent-green: #39d353;
+  --accent-amber: #e3a845;
+  --accent-red: #cf222e;
+  --accent-blue: #58a6ff;
+
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #484f58;
+
+  --border-subtle: #21262d;
+  --border-muted: #30363d;
+  --border-accent: #388bfd;
+
+  --outcome-success: #39d353;
+  --outcome-partial: #e3a845;
+  --outcome-failure: #cf222e;
+  --outcome-total-failure: #8b0000;
+}
+
+* {
+  border-color: var(--border-subtle);
+}
+
+html,
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-inter), "DM Sans", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.scanlines {
+  position: relative;
+}
+
+.scanlines::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgb(10 12 15 / 0.18) 2px,
+    rgb(10 12 15 / 0.18) 3px
+  );
+  opacity: 0.35;
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fade-in 200ms ease-out;
+}

@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Squadron {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  tag       String?
+  createdAt DateTime @default(now())
+  pilots    Pilot[]
+  flights   Flight[]
+}
+
+model Pilot {
+  id         String    @id @default(cuid())
+  name       String
+  callsign   String?
+  squadronId String
+  squadron   Squadron  @relation(fields: [squadronId], references: [id])
+  createdAt  DateTime  @default(now())
+  flights    Flight[]
+}
+
+model Aircraft {
+  id       String   @id @default(cuid())
+  name     String
+  game     String
+  isCustom Boolean  @default(false)
+  flights  Flight[]
+
+  @@unique([name, game])
+}
+
+model Flight {
+  id          String   @id @default(cuid())
+  date        DateTime @default(now())
+  pilotId     String
+  pilot       Pilot    @relation(fields: [pilotId], references: [id])
+  squadronId  String
+  squadron    Squadron @relation(fields: [squadronId], references: [id])
+  aircraftId  String
+  aircraft    Aircraft @relation(fields: [aircraftId], references: [id])
+  game        String
+  duration    Int
+  missionType String?
+  missionName String?
+  outcome     String
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
