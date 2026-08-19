@@ -74,14 +74,9 @@ export default async function DashboardPage() {
             Tableau de bord
           </h1>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button asChild variant="secondary">
-            <a href="/api/flights/export">Exporter CSV</a>
-          </Button>
-          <Button asChild size="lg">
-            <Link href="/log">Enregistrer un vol</Link>
-          </Button>
-        </div>
+        <Button asChild size="lg">
+          <Link href="/log">Enregistrer un vol</Link>
+        </Button>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">

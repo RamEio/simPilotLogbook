@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -17,10 +17,30 @@ const links = [
 export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    function onScroll() {
+      const currentY = window.scrollY;
+      const isMobile = window.innerWidth < 768;
+      if (isMobile && currentY > 80) {
+        setHidden(currentY > lastScrollY.current);
+      } else {
+        setHidden(false);
+      }
+      lastScrollY.current = currentY;
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <header
-      className="sticky top-0 z-40 border-b-2 border-line-muted bg-bg-secondary bg-cover bg-center"
+      className={cn(
+        "sticky top-0 z-40 border-b-2 border-line-muted bg-bg-secondary bg-cover bg-center transition-transform duration-300",
+        hidden && "-translate-y-full",
+      )}
       style={{ backgroundImage: "url('/images/Header-base_big_no_text.jpg')" }}
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#1e2a3a]/80 via-[#1e2a3a]/50 to-transparent" />

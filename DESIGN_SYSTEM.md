@@ -105,6 +105,19 @@ Base : `rounded-sm border-2 border-line-muted bg-bg-card shadow-kneeboard`
 Classe CSS : `.panel`
 Style : `bg-card`, `border 2px solid border-muted`, `border-radius 2px`, `box-shadow subtile`
 
+### Outcome Badges
+
+Style : **bloc plein** avec texte blanc — contraste garanti 7:1+ sur tous les fonds.
+
+| Outcome | Fond | Texte |
+|---------|------|-------|
+| Succès | `bg-outcome-success` (#2e7d32) | blanc |
+| Partiel | `bg-outcome-partial` (#b8860b) | blanc |
+| Échec | `bg-outcome-failure` (#a8201a) | blanc |
+| Échec total | `bg-outcome-total-failure` (#6b0000) | blanc |
+
+**Règle** : ne jamais utiliser de fonds transparents (`bg-*/10`) pour les badges de statut — ils ne garantissent pas le contraste WCAG AA sur fond clair.
+
 ### Inputs / Selects / Textareas
 
 Style commun : `rounded-md border border-line-muted bg-bg-elevated px-3 py-2 text-sm text-ink-primary`

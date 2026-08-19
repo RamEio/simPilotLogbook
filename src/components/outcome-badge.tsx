@@ -3,14 +3,14 @@ import { cn } from "@/lib/utils";
 import { outcomeMeta } from "@/lib/constants";
 
 const styles: Record<Outcome, string> = {
-  SUCCESS: "border-outcome-success/50 bg-outcome-success/10 text-outcome-success",
+  SUCCESS: "border-outcome-success bg-outcome-success text-white",
   PARTIAL_AIRCRAFT:
-    "border-outcome-partial/50 bg-outcome-partial/10 text-outcome-partial",
+    "border-outcome-partial bg-outcome-partial text-white",
   PARTIAL_PILOT:
-    "border-outcome-partial/50 bg-outcome-partial/10 text-outcome-partial",
-  FAILURE: "border-outcome-failure/50 bg-outcome-failure/10 text-outcome-failure",
+    "border-outcome-partial bg-outcome-partial text-white",
+  FAILURE: "border-outcome-failure bg-outcome-failure text-white",
   TOTAL_FAILURE:
-    "border-outcome-total-failure bg-outcome-total-failure/40 text-red-200",
+    "border-outcome-total-failure bg-outcome-total-failure text-white",
 };
 
 export function OutcomeBadge({ outcome }: { outcome: string }) {
