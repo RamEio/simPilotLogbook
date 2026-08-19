@@ -41,7 +41,7 @@ export function Nav() {
         "sticky top-0 z-40 border-b-2 border-line-muted bg-bg-secondary bg-cover bg-center transition-transform duration-300",
         hidden && "-translate-y-full",
       )}
-      style={{ backgroundImage: "url('/images/Header-base_big_no_text.jpg')" }}
+      style={{ backgroundImage: "url('/images/Header-base_big_no_text_thinner.jpg')" }}
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#1e2a3a]/80 via-[#1e2a3a]/50 to-transparent" />
       <div className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-16">
