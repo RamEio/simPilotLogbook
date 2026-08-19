@@ -21,10 +21,10 @@ export function Nav() {
   return (
     <header
       className="sticky top-0 z-40 border-b-2 border-line-muted bg-bg-secondary bg-cover bg-center"
-      style={{ backgroundImage: "url('/images/Header-base_big.jpg')" }}
+      style={{ backgroundImage: "url('/images/Header-base_big_no_text.jpg')" }}
     >
-      <div className="pointer-events-none absolute inset-0 bg-bg-secondary/70 backdrop-blur-[2px]" />
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#1e2a3a]/80 via-[#1e2a3a]/50 to-transparent" />
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-5">
         <Link href="/" className="relative z-10">
           <p className="font-display text-lg uppercase tracking-[0.18em] text-white drop-shadow-md">
             Sim Pilot Logbook

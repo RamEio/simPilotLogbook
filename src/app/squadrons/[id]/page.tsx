@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FlightCard } from "@/components/flight-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SquadronIcon } from "@/components/icons/squadron-icons";
 import { prisma } from "@/lib/prisma";
 import { formatHours } from "@/lib/utils";
 
@@ -49,9 +50,12 @@ export default async function SquadronDetailPage({
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink-muted">
           Ops / Squadron
         </p>
-        <h1 className="mt-1 font-display text-2xl tracking-wider">
-          {squadron.tag ? `${squadron.tag} ` : ""}
-          {squadron.name}
+        <h1 className="mt-1 flex items-center gap-3 font-display text-2xl uppercase tracking-wider text-accent-primary">
+          <SquadronIcon icon={squadron.icon} className="h-7 w-7 shrink-0" />
+          <span>
+            {squadron.tag ? `${squadron.tag} ` : ""}
+            {squadron.name}
+          </span>
         </h1>
       </div>
       <div className="grid gap-3 sm:grid-cols-3">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SquadronIcon } from "@/components/icons/squadron-icons";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -34,9 +35,12 @@ export default async function SquadronsPage() {
             <Link key={squadron.id} href={`/squadrons/${squadron.id}`}>
               <Card className="transition-colors hover:border-line-accent">
                 <CardHeader>
-                  <CardTitle>
-                    {squadron.tag ? `${squadron.tag} ` : ""}
-                    {squadron.name}
+                  <CardTitle className="flex items-center gap-2">
+                    <SquadronIcon icon={squadron.icon} className="h-5 w-5 shrink-0" />
+                    <span>
+                      {squadron.tag ? `${squadron.tag} ` : ""}
+                      {squadron.name}
+                    </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="font-mono text-xs text-ink-muted">

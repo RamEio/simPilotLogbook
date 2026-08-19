@@ -6,6 +6,7 @@ import { handleError, jsonError } from "@/lib/http";
 const createSquadronSchema = z.object({
   name: z.string().trim().min(1, "Nom requis"),
   tag: z.string().trim().optional().nullable(),
+  icon: z.string().trim().optional().default("shield"),
 });
 
 export async function GET() {
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
       data: {
         name: body.name,
         tag: body.tag || undefined,
+        icon: body.icon,
       },
     });
     return NextResponse.json(squadron, { status: 201 });

@@ -1,0 +1,9 @@
+﻿id,date,duration_min,game,aircraft,squadron,squadron_tag,pilot,callsign,mission_type,mission_name,outcome,notes
+cmsz27etk0006myp6ku6oe1m9,2026-08-18T19:32:16.711Z,43,IL2_KOREA,MiG-15bis,Flying Pengus,400,RamE,Ram-1,CAP,CAP Tongton,SUCCESS,2 assists non enregistrés
+cmsz2a5nv0008myp6l1lkk20y,2026-08-18T19:34:24.810Z,31,IL2_KOREA,MiG-15bis,Flying Pengus,400,Raph,Alphare,CAP,CAP Tongton,TOTAL_FAILURE,Abattu par un F51
+cmsz2xyb0000amyp6uk0toa2k,2026-08-18T19:52:55.019Z,35,IL2_KOREA,MiG-15bis,Flying Pengus,400,RamE,Ram-1,CAP,CAP Dans les terres,FAILURE,Abbatu par un jet americain
+cmsz3v7ae000emyp6ky26g1d4,2026-08-18T20:18:46.309Z,20,IL2_KOREA,Il-10,Flying Pengus,400,RamE,Ram-2,Bombardement,Bombardement ROK 105 Mobile armor,FAILURE,
+cmsz3woaa000kmyp6d4d1s0d8,2026-08-18T20:19:54.993Z,30,IL2_KOREA,MiG-15bis,Flying Pengus,400,Raph,Alphare-2,CAP,CAP Dans les terres,TOTAL_FAILURE,
+cmsz3xg1z000mmyp6swzxj6ra,2026-08-18T20:20:30.982Z,23,IL2_KOREA,Il-10,Flying Pengus,400,Raph,Alphare-3,Bombardement,Bombardement ROK 105 Mobile armor,FAILURE,
+cmsz4lqf8000omyp6rq7ez858,2026-08-18T20:39:24.163Z,20,IL2_KOREA,Il-10,Flying Pengus,400,Raph,Alphare-3,Bombardement,Bombardement ROK 105 Mobile armor,SUCCESS,
+cmsz4mddz000qmyp6bcjv8fg9,2026-08-18T20:39:53.927Z,20,IL2_KOREA,Il-10,Flying Pengus,400,RamE,Ram-2,Bombardement,Bombardement ROK 105 Mobile armor,PARTIAL_PILOT,

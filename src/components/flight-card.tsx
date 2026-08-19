@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react";
 import type { Outcome } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { OutcomeBadge } from "@/components/outcome-badge";
+import { GameIcon } from "@/components/icons/game-icons";
 import { gameLabel } from "@/lib/constants";
 import { formatDate, formatDuration } from "@/lib/utils";
 
@@ -29,7 +30,10 @@ export function FlightCard({
     <article className="group flex items-start justify-between gap-3 rounded-md border border-line-subtle bg-bg-card p-4 transition-colors duration-200 hover:border-line-accent">
       <div className="min-w-0 space-y-1">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="game">{gameLabel(flight.game)}</Badge>
+          <Badge variant="game" className="flex items-center gap-1">
+            <GameIcon game={flight.game} className="h-3.5 w-3.5" />
+            {gameLabel(flight.game)}
+          </Badge>
           <p className="truncate font-medium text-ink-primary">
             {flight.aircraft.name}
           </p>

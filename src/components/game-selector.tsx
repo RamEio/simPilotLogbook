@@ -2,6 +2,7 @@
 
 import type { Game } from "@/lib/constants";
 import { GAMES } from "@/lib/constants";
+import { GameIcon } from "@/components/icons/game-icons";
 import { cn } from "@/lib/utils";
 
 export function GameSelector({
@@ -27,7 +28,8 @@ export function GameSelector({
                 : "border-line-muted bg-bg-elevated text-ink-secondary hover:border-accent-green",
             )}
           >
-            <span className="font-display text-xs tracking-wider">
+            <GameIcon game={game.value} className="mx-auto h-5 w-5" />
+            <span className="mt-1 font-display text-xs tracking-wider">
               {game.short}
             </span>
           </button>

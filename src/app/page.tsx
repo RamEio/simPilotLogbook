@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FlightCard } from "@/components/flight-card";
 import { GAMES, gameLabel } from "@/lib/constants";
+import { GameIcon } from "@/components/icons/game-icons";
 import { prisma } from "@/lib/prisma";
 import { formatHours } from "@/lib/utils";
 
@@ -112,7 +113,10 @@ export default async function DashboardPage() {
           {byGame.map((game) => (
             <div key={game.value} className="space-y-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-ink-secondary">{game.short}</span>
+                <span className="flex items-center gap-2 text-ink-secondary">
+                  <GameIcon game={game.value} className="h-4 w-4" />
+                  {game.short}
+                </span>
                 <span className="font-mono text-ink-muted">{game.count}</span>
               </div>
               <div className="h-2 overflow-hidden rounded-sm bg-bg-elevated">
@@ -145,7 +149,8 @@ export default async function DashboardPage() {
                     <span className="font-mono text-ink-muted">
                       {aircraft.count}
                     </span>
-                    <span className="rounded-sm bg-bg-elevated px-1.5 py-0.5 font-mono text-[10px] text-ink-muted">
+                    <span className="flex items-center gap-1 rounded-sm bg-bg-elevated px-1.5 py-0.5 font-mono text-[10px] text-ink-muted">
+                      <GameIcon game={aircraft.game} className="h-3 w-3" />
                       {gameLabel(aircraft.game)}
                     </span>
                   </span>
