@@ -59,7 +59,6 @@ export async function POST(request: NextRequest) {
           where: {
             squadronId: squadron.id,
             name: row.pilot,
-            callsign: row.callsign || null,
           },
         })) ??
         (await prisma.pilot.create({
@@ -104,6 +103,19 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof Error && error.message.startsWith("Ligne ")) {
       return jsonError(error.message, 400);
+    }
+    console.error("[import] Error details:", error);
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      typeof (error as Record<string, unknown>).code === "string"
+    ) {
+      const prismaError = error as { code: string; meta?: Record<string, unknown> };
+      return jsonError(
+        `Erreur base de données (${prismaError.code}): ${JSON.stringify(prismaError.meta ?? {})}`,
+        400,
+      );
     }
     return handleError(error);
   }
