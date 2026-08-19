@@ -30,12 +30,12 @@ export default async function DashboardPage() {
         by: ["aircraftId"],
         _count: { _all: true },
         _sum: { duration: true },
-        orderBy: { _count: { _all: "desc" } },
-        take: 8,
       }),
     ]);
 
-  const aircraftIds = byAircraftRaw.map((r) => r.aircraftId);
+  byAircraftRaw.sort((a, b) => b._count._all - a._count._all);
+  const topAircraft = byAircraftRaw.slice(0, 8);
+  const aircraftIds = topAircraft.map((r) => r.aircraftId);
   const aircraftMap = Object.fromEntries(
     (
       await prisma.aircraft.findMany({
@@ -45,7 +45,7 @@ export default async function DashboardPage() {
     ).map((a) => [a.id, a]),
   );
 
-  const byAircraft = byAircraftRaw.map((r) => ({
+  const byAircraft = topAircraft.map((r) => ({
     id: r.aircraftId,
     name: aircraftMap[r.aircraftId]?.name ?? "Inconnu",
     game: aircraftMap[r.aircraftId]?.game ?? "",
