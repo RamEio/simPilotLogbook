@@ -9,6 +9,9 @@ const badgeVariants = cva(
       variant: {
         default: "border-line-muted text-ink-secondary",
         game: "border-accent-blue/40 bg-accent-blue/10 text-accent-blue",
+        destructive: "border-accent-red/40 bg-accent-red/10 text-accent-red",
+        outline: "border-line-muted bg-transparent text-ink-secondary",
+        success: "border-outcome-success/40 bg-outcome-success/10 text-outcome-success",
       },
     },
     defaultVariants: {

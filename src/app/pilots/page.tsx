@@ -48,7 +48,7 @@ export default async function PilotsPage() {
                         H.C.
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-[10px] text-outcome-success border-outcome-success">
+                      <Badge variant="success" className="text-[10px]">
                         Vivant
                       </Badge>
                     )}
