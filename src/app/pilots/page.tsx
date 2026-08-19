@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -31,16 +33,33 @@ export default async function PilotsPage() {
         {pilots.length === 0 ? (
           <p className="text-sm text-ink-secondary">Aucun pilote.</p>
         ) : (
-          pilots.map((pilot) => (
-            <Card key={pilot.id}>
-              <CardHeader>
-                <CardTitle>{pilot.callsign ?? pilot.name}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-ink-secondary">
-                {pilot.squadron.tag ?? pilot.squadron.name} · {pilot._count.flights} vols
-              </CardContent>
-            </Card>
-          ))
+          pilots.map((pilot) => {
+            const outOfCombat = pilot.status === "OUT_OF_COMBAT";
+            return (
+              <Card
+                key={pilot.id}
+                className={cn(outOfCombat && "opacity-50 grayscale")}
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span>{pilot.callsign ?? pilot.name}</span>
+                    {outOfCombat ? (
+                      <Badge variant="destructive" className="text-[10px]">
+                        H.C.
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-[10px] text-outcome-success border-outcome-success">
+                        Vivant
+                      </Badge>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-ink-secondary">
+                  {pilot.squadron.tag ?? pilot.squadron.name} · {pilot._count.flights} vols
+                </CardContent>
+              </Card>
+            );
+          })
         )}
       </div>
     </div>

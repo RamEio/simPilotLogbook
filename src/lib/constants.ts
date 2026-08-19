@@ -54,6 +54,17 @@ export const OUTCOMES: {
   },
 ];
 
+export const PILOT_STATUSES = [
+  { value: "ALIVE", label: "Vivant", short: "Vivant" },
+  { value: "OUT_OF_COMBAT", label: "Hors de combat", short: "H.C." },
+] as const;
+
+export type PilotStatus = (typeof PILOT_STATUSES)[number]["value"];
+
+export function pilotStatusMeta(status: string) {
+  return PILOT_STATUSES.find((s) => s.value === status) ?? PILOT_STATUSES[0];
+}
+
 export const MISSION_TYPES = [
   "CAP",
   "CAS",

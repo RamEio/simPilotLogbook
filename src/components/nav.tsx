@@ -24,7 +24,7 @@ export function Nav() {
       style={{ backgroundImage: "url('/images/Header-base_big_no_text.jpg')" }}
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#1e2a3a]/80 via-[#1e2a3a]/50 to-transparent" />
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-10">
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-16">
         <Link href="/" className="relative z-10">
           <p className="font-display text-2xl uppercase tracking-[0.18em] text-white drop-shadow-md md:text-3xl">
             Sim Pilot Logbook

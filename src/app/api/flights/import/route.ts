@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
         create: {
           name: row.squadron,
           tag: row.squadron_tag || undefined,
+          icon: "shield",
         },
       });
 

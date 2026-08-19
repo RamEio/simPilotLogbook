@@ -21,6 +21,7 @@ model Pilot {
   id         String    @id @default(cuid())
   name       String
   callsign   String?
+  status     String    @default("ALIVE")
   squadronId String
   squadron   Squadron  @relation(fields: [squadronId], references: [id])
   createdAt  DateTime  @default(now())

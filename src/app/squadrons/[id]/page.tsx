@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { FlightCard } from "@/components/flight-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SquadronIcon } from "@/components/icons/squadron-icons";
+import { PilotStatusToggle } from "@/components/pilot-status-toggle";
 import { prisma } from "@/lib/prisma";
+import { cn } from "@/lib/utils";
 import { formatHours } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -93,11 +95,23 @@ export default async function SquadronDetailPage({
           </p>
         ) : (
           <ul className="grid gap-2">
-            {squadron.pilots.map((pilot) => (
-              <li key={pilot.id} className="rounded-md border border-line-subtle bg-bg-card px-3 py-2">
-                {pilot.callsign ?? pilot.name}
-              </li>
-            ))}
+            {squadron.pilots.map((pilot) => {
+              const outOfCombat = pilot.status === "OUT_OF_COMBAT";
+              return (
+                <li
+                  key={pilot.id}
+                  className={cn(
+                    "flex items-center justify-between rounded-sm border-2 border-line-muted bg-bg-card px-3 py-2 shadow-kneeboard",
+                    outOfCombat && "opacity-50 grayscale",
+                  )}
+                >
+                  <span className={cn(outOfCombat && "line-through")}>
+                    {pilot.callsign ?? pilot.name}
+                  </span>
+                  <PilotStatusToggle pilotId={pilot.id} status={pilot.status} />
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
