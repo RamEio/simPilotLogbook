@@ -21,7 +21,7 @@ export function Nav() {
   return (
     <header
       className="sticky top-0 z-40 border-b-2 border-line-muted bg-bg-secondary bg-cover bg-center"
-      style={{ backgroundImage: "url('/images/Header-base.png')" }}
+      style={{ backgroundImage: "url('/images/Header-base_big.jpg')" }}
     >
       <div className="pointer-events-none absolute inset-0 bg-bg-secondary/70 backdrop-blur-[2px]" />
       <div className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-4">

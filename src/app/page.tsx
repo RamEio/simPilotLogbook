@@ -2,30 +2,58 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FlightCard } from "@/components/flight-card";
-import { GAMES } from "@/lib/constants";
+import { GAMES, gameLabel } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { formatHours } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [totalFlights, duration, recentFlights, grouped] = await Promise.all([
-    prisma.flight.count(),
-    prisma.flight.aggregate({ _sum: { duration: true } }),
-    prisma.flight.findMany({
-      include: {
-        aircraft: true,
-        pilot: true,
-        squadron: true,
-      },
-      orderBy: { date: "desc" },
-      take: 5,
-    }),
-    prisma.flight.groupBy({
-      by: ["game"],
-      _count: { _all: true },
-    }),
-  ]);
+  const [totalFlights, duration, recentFlights, grouped, byAircraftRaw] =
+    await Promise.all([
+      prisma.flight.count(),
+      prisma.flight.aggregate({ _sum: { duration: true } }),
+      prisma.flight.findMany({
+        include: {
+          aircraft: true,
+          pilot: true,
+          squadron: true,
+        },
+        orderBy: { date: "desc" },
+        take: 5,
+      }),
+      prisma.flight.groupBy({
+        by: ["game"],
+        _count: { _all: true },
+      }),
+      prisma.flight.groupBy({
+        by: ["aircraftId"],
+        _count: { _all: true },
+        _sum: { duration: true },
+        orderBy: { _count: { _all: "desc" } },
+        take: 8,
+      }),
+    ]);
+
+  const aircraftIds = byAircraftRaw.map((r) => r.aircraftId);
+  const aircraftMap = Object.fromEntries(
+    (
+      await prisma.aircraft.findMany({
+        where: { id: { in: aircraftIds } },
+        select: { id: true, name: true, game: true },
+      })
+    ).map((a) => [a.id, a]),
+  );
+
+  const byAircraft = byAircraftRaw.map((r) => ({
+    id: r.aircraftId,
+    name: aircraftMap[r.aircraftId]?.name ?? "Inconnu",
+    game: aircraftMap[r.aircraftId]?.game ?? "",
+    count: r._count._all,
+    hours: r._sum.duration ?? 0,
+  }));
+
+  const maxAircraftCount = Math.max(1, ...byAircraft.map((a) => a.count));
 
   const totalMinutes = duration._sum.duration ?? 0;
   const maxCount = Math.max(1, ...grouped.map((item) => item._count._all));
@@ -95,6 +123,44 @@ export default async function DashboardPage() {
               </div>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Répartition par appareil</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {byAircraft.length === 0 ? (
+            <p className="text-sm text-ink-secondary">Aucun vol enregistré.</p>
+          ) : (
+            byAircraft.map((aircraft) => (
+              <div key={aircraft.id} className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-ink-primary">{aircraft.name}</span>
+                  <span className="flex items-center gap-3">
+                    <span className="font-mono text-xs text-ink-muted">
+                      {formatHours(aircraft.hours)}
+                    </span>
+                    <span className="font-mono text-ink-muted">
+                      {aircraft.count}
+                    </span>
+                    <span className="rounded-sm bg-bg-elevated px-1.5 py-0.5 font-mono text-[10px] text-ink-muted">
+                      {gameLabel(aircraft.game)}
+                    </span>
+                  </span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-sm bg-bg-elevated">
+                  <div
+                    className="h-full bg-accent-primary"
+                    style={{
+                      width: `${(aircraft.count / maxAircraftCount) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            ))
+          )}
         </CardContent>
       </Card>
 
