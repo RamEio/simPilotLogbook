@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Inter, JetBrains_Mono, Orbitron } from "next/font/google";
+import { Inter, JetBrains_Mono, Barlow_Condensed } from "next/font/google";
 import { Toaster } from "sonner";
 import { Nav } from "@/components/nav";
 import "@/styles/globals.css";
@@ -11,10 +11,10 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const orbitron = Orbitron({
+const barlowCondensed = Barlow_Condensed({
   subsets: ["latin"],
-  weight: ["700"],
-  variable: "--font-orbitron",
+  weight: ["600"],
+  variable: "--font-barlow-condensed",
 });
 
 const jetbrains = JetBrains_Mono({
@@ -37,19 +37,20 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${inter.variable} ${orbitron.variable} ${jetbrains.variable}`}
+      className={`${inter.variable} ${barlowCondensed.variable} ${jetbrains.variable}`}
     >
       <body className="min-h-screen bg-bg-primary font-body text-ink-primary antialiased">
         <Nav />
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
         <Toaster
-          theme="dark"
+          theme="light"
           position="bottom-right"
           toastOptions={{
             style: {
-              background: "#161B22",
-              border: "1px solid #30363D",
-              color: "#E6EDF3",
+              background: "#d6dae0",
+              border: "2px solid #8a929c",
+              color: "#1a1e24",
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
             },
           }}
         />

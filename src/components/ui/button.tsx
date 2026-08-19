@@ -4,19 +4,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-blue disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm text-sm font-display uppercase tracking-wider transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-accent-green text-bg-primary hover:bg-accent-green/90 font-display tracking-wide",
+          "bg-accent-primary text-white hover:bg-accent-primary-hover shadow-kneeboard",
         secondary:
-          "bg-bg-elevated text-ink-primary border border-line-muted hover:border-accent-green hover:shadow-glow",
+          "bg-white/50 text-accent-primary-text border-2 border-accent-primary hover:bg-accent-primary hover:text-white",
         outline:
-          "border border-line-muted bg-transparent text-ink-primary hover:border-accent-green",
+          "border-2 border-line-muted bg-transparent text-ink-primary hover:border-accent-primary",
         ghost: "text-ink-secondary hover:bg-bg-elevated hover:text-ink-primary",
-        destructive: "bg-accent-red text-ink-primary hover:bg-accent-red/90",
-        link: "text-accent-blue underline-offset-4 hover:underline",
+        destructive: "bg-accent-red text-white hover:bg-accent-red/90",
+        link: "text-accent-blue underline-offset-4 hover:underline normal-case tracking-normal",
       },
       size: {
         default: "h-10 px-4 py-2",

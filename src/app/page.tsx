@@ -41,8 +41,8 @@ export default async function DashboardPage() {
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink-muted">
             Ops / Dashboard
           </p>
-          <h1 className="mt-1 font-display text-2xl tracking-wider">
-            Sim Pilot Logbook
+          <h1 className="mt-1 font-display text-2xl uppercase tracking-wider text-accent-primary">
+            Tableau de bord
           </h1>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -56,7 +56,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Card>
+        <Card className="border-t-4 border-t-accent-primary">
           <CardHeader>
             <CardTitle>Vols</CardTitle>
           </CardHeader>
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
             <p className="font-mono text-3xl text-ink-primary">{totalFlights}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-t-4 border-t-accent-primary">
           <CardHeader>
             <CardTitle>Heures de vol</CardTitle>
           </CardHeader>
@@ -89,7 +89,7 @@ export default async function DashboardPage() {
               </div>
               <div className="h-2 overflow-hidden rounded-sm bg-bg-elevated">
                 <div
-                  className="h-full bg-accent-green"
+                  className="h-full bg-accent-primary"
                   style={{ width: `${(game.count / maxCount) * 100}%` }}
                 />
               </div>
@@ -100,7 +100,7 @@ export default async function DashboardPage() {
 
       <section className="space-y-3">
         <h2 className="font-display text-sm tracking-wider text-ink-secondary">
-          Derniers vols
+          DERNIERS VOLS
         </h2>
         {recentFlights.length === 0 ? (
           <Card>
