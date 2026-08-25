@@ -13,17 +13,17 @@ export function PilotStatusToggle({
   status: string;
 }) {
   const router = useRouter();
-  const isAlive = status !== "OUT_OF_COMBAT";
+  const isActive = status !== "OUT_OF_ACTION";
 
   async function toggle() {
     try {
       await apiFetch(`/api/pilots/${pilotId}`, {
-        method: "PATCH",
+        method: "PUT",
         body: JSON.stringify({
-          status: isAlive ? "OUT_OF_COMBAT" : "ALIVE",
+          status: isActive ? "OUT_OF_ACTION" : "ACTIVE",
         }),
       });
-      toast.success(isAlive ? "Pilote hors de combat" : "Pilote de retour");
+      toast.success(isActive ? "Pilote hors comb." : "Pilote de retour");
       router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erreur");
@@ -34,15 +34,15 @@ export function PilotStatusToggle({
     <button
       type="button"
       onClick={() => void toggle()}
-      title={isAlive ? "Mettre hors de combat" : "Remettre en service"}
+      title={isActive ? "Mettre hors de combat" : "Remettre en service"}
       className={cn(
-        "rounded-sm px-2 py-1 font-display text-[10px] uppercase tracking-wider transition-colors",
-        isAlive
-          ? "border border-outcome-success text-outcome-success hover:bg-outcome-success/10"
-          : "border border-accent-red text-accent-red hover:bg-accent-red/10",
+        "rounded px-2 py-1 text-overline font-medium uppercase tracking-overline transition-colors",
+        isActive
+          ? "border border-status-success/40 text-status-success hover:bg-status-success/10"
+          : "border border-status-error/40 text-status-error hover:bg-status-error/10",
       )}
     >
-      {isAlive ? "Vivant" : "H.C."}
+      {isActive ? "Actif" : "Hors comb."}
     </button>
   );
 }

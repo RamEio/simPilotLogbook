@@ -91,11 +91,35 @@
 
 ## À faire / backlog
 
-- [ ] Filtres avancés leaderboard (déjà période + sim — éventuellement top kills)
+- [ ] **Discussion en pause** — voir section « Parking produit » ci-dessous
+- [ ] Filtres leaderboard avancés (tri + escadrille + statut) — pilotes **et** escadrilles
+- [ ] Kills par vol : Aérien / Ground / Naval / Building (+ CSV + classements)
+- [ ] Passe UI cards pilote homogènes (DS Korea + reviewer UX)
 - [ ] Édition vol : confirmation visuelle plus forte post-save
 - [ ] Accessibilité : audit WCAG focus order / contrastes light mode
-- [ ] Déployer les changements DS + statut pilote sur Apply.Build
-- [ ] Sync assets header en prod (`public/header-*.png`)
+- [x] Déployer les changements DS + statut pilote sur Apply.Build *(push `9846e33` — build cassé, fix constantes en cours)*
+- [x] Sync assets header en prod (`public/header-*.png`)
+
+## Parking produit — discussion 25/08/2026 (à reprendre)
+
+**Contexte :** après Korea v3, on a discuté la suite leaderboard / kills / UI pilotes. Pause pour corriger le build Apply.Build.
+
+### Décisions validées en discussion
+- Classer **pilotes et escadrilles** (déjà présent sur `/leaderboard` ; enrichir filtres/tri)
+- Filtres envisagés v1 : **tri** (heures / vols / réussite) + **escadrille** + **statut** (Actif / tous)
+- **Kills** intéressants : 4 catégories par pilote via les vols — **Aérien, Ground, Naval, Building**
+- Passe **cards pilote** partout pour homogénéité DS + `ASSETS/cursor_ux_ui_product_reviewer_improved.md`
+
+### Ouvert (à trancher au retour)
+1. Saisie kills : **par vol** (recommandé) ou total manuel fiche pilote ?
+2. Leaderboard kills : **total global** d’abord, ou 4 classements séparés ?
+3. Kills optionnels (défaut 0) — oui recommandé pour ne pas freiner le log
+
+### Phasage proposé au retour
+1. Fix déploiement / stabilité
+2. Filtres leaderboard v1
+3. Schéma + UI kills + CSV
+4. Composant `PilotCard`/`PilotRow` unique
 
 ---
 

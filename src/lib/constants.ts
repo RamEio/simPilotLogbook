@@ -54,17 +54,6 @@ export const OUTCOMES: {
   },
 ];
 
-export const PILOT_STATUSES = [
-  { value: "ALIVE", label: "Vivant", short: "Vivant" },
-  { value: "OUT_OF_COMBAT", label: "Hors de combat", short: "H.C." },
-] as const;
-
-export type PilotStatus = (typeof PILOT_STATUSES)[number]["value"];
-
-export function pilotStatusMeta(status: string) {
-  return PILOT_STATUSES.find((s) => s.value === status) ?? PILOT_STATUSES[0];
-}
-
 export const MISSION_TYPES = [
   "CAP",
   "CAS",
@@ -78,6 +67,7 @@ export const MISSION_TYPES = [
 
 export type MissionType = (typeof MISSION_TYPES)[number];
 
+/** Canonical pilot statuses (Korea v3 product decision). */
 export const PILOT_STATUS_VALUES = ["ACTIVE", "OUT_OF_ACTION"] as const;
 
 export type PilotStatus = (typeof PILOT_STATUS_VALUES)[number];
@@ -85,9 +75,10 @@ export type PilotStatus = (typeof PILOT_STATUS_VALUES)[number];
 export const PILOT_STATUSES: {
   value: PilotStatus;
   label: string;
+  short: string;
 }[] = [
-  { value: "ACTIVE", label: "Actif" },
-  { value: "OUT_OF_ACTION", label: "Hors comb." },
+  { value: "ACTIVE", label: "Actif", short: "Actif" },
+  { value: "OUT_OF_ACTION", label: "Hors comb.", short: "H.C." },
 ];
 
 export function gameLabel(game: string): string {
