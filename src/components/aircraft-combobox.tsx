@@ -52,7 +52,7 @@ export function AircraftCombobox({
         }}
       />
       {open && !disabled && (
-        <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-md border border-line-muted bg-bg-card">
+        <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded border border-line-default bg-bg-card shadow-level-2">
           {filtered.length === 0 ? (
             <li className="px-3 py-2 text-sm text-ink-muted">Aucun appareil</li>
           ) : (
@@ -61,8 +61,8 @@ export function AircraftCombobox({
                 <button
                   type="button"
                   className={cn(
-                    "flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-bg-elevated",
-                    item.id === value && "text-accent-green",
+                    "flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-bg-hover",
+                    item.id === value && "text-crimson-600",
                   )}
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => {
@@ -73,7 +73,7 @@ export function AircraftCombobox({
                 >
                   <span>{item.name}</span>
                   {item.isCustom ? (
-                    <span className="font-mono text-[10px] uppercase text-ink-muted">
+                    <span className="text-[10px] uppercase tracking-overline text-ink-muted">
                       custom
                     </span>
                   ) : null}

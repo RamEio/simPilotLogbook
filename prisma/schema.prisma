@@ -11,7 +11,6 @@ model Squadron {
   id        String   @id @default(cuid())
   name      String   @unique
   tag       String?
-  icon      String   @default("shield")
   createdAt DateTime @default(now())
   pilots    Pilot[]
   flights   Flight[]
@@ -21,7 +20,8 @@ model Pilot {
   id         String    @id @default(cuid())
   name       String
   callsign   String?
-  status     String    @default("ALIVE")
+  pin        String? // optional 4-digit club PIN (never returned by API)
+  status     String    @default("ACTIVE") // ACTIVE | OUT_OF_ACTION
   squadronId String
   squadron   Squadron  @relation(fields: [squadronId], references: [id])
   createdAt  DateTime  @default(now())

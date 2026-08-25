@@ -125,10 +125,13 @@ enum Outcome {
 /squadrons/[id]      → Fiche escadrille (pilotes, stats, vols)
 /squadrons/new       → Créer une escadrille
 /pilots              → Liste des pilotes
+/pilots/[id]         → Fiche pilote (stats, historique)
 /pilots/new          → Créer un pilote
-/leaderboard         → [FUTUR] Classement pilotes & escadrilles
+/leaderboard         → Classement pilotes & escadrilles
 /admin/seed          → [DEV] Seeder les avions pré-remplis
 ```
+
+Auth (futur PIN) : composant `AuthPinPanel` — UI Korea v3 prête, logique non branchée (mode club trust actuel).
 
 ### Page principale — Dashboard `/`
 - Compteur total de vols / heures de vol
@@ -154,90 +157,62 @@ Formulaire en une seule page, 7 champs :
 
 ---
 
-## 5. DESIGN SYSTEM — "HANGAR OPS"
+## 5. DESIGN SYSTEM — "KOREA v3.0"
+
+> Spec source : [`ASSETS/simpilot_designsystem.md`](./ASSETS/simpilot_designsystem.md)  
+> Visuels : `ASSETS/design-system-sim-pilot-logbook.png` (dark), `ASSETS/design-system-light-mode.png` (light)
 
 ### Inspiration visuelle
-Références benchmark :
-- **Esthétique cockpit 1990s** : CRT vert sur fond très sombre, scanlines subtiles
-- **Mil-Spec HUD** : Typographie technique, grilles, indicateurs d'état sémantiques
-- **Approche moderne** : Propre et lisible, pas "over-designed" — respecte MIL-STD-1472 (contraste, hiérarchie)
+- **Tactical HUD** : registre militaire aviation, overlines uppercase, accents crimson / amber
+- **Dark-first** avec **Light mode** miroir (même structure, échelle de valeurs inversée)
+- Palette **fermée** — pas de nouvelles couleurs hors tokens
 
-### Palette de couleurs
+### Modes
+- Défaut : **dark** (`data-theme="dark"`)
+- Toggle : icône soleil / lune en haut à droite du header (`ThemeToggle`)
+- Persistance : `localStorage` clé `spl-theme` + script anti-FOUC dans `layout.tsx`
+
+### Tokens CSS (`src/styles/globals.css`)
 
 ```css
-/* Tokens CSS — Design System "Hangar Ops" */
-:root {
-  /* Fonds */
-  --bg-primary:    #0A0C0F;   /* Noir hangar */
-  --bg-secondary:  #111418;   /* Gris acier très sombre */
-  --bg-card:       #161B22;   /* Carte / panel */
-  --bg-elevated:   #1C2128;   /* Élément surélevé */
+/* Dark (extrait) */
+--bg-deep: #0B0F19;
+--bg-elevated: #111827;
+--bg-card: #1E293B;
+--red-600: #DC2626;       /* CTA only */
+--amber-500: #F59E0B;     /* nav / kickers (dark) */
+--status-success: #10B981;
+--text-primary: #FFFFFF;
+--border-default: #334155;
 
-  /* Accents principaux */
-  --accent-green:  #39D353;   /* Vert radar / succès */
-  --accent-amber:  #E3A845;   /* Ambre cockpit / alerte */
-  --accent-red:    #CF222E;   /* Rouge danger / échec */
-  --accent-blue:   #58A6FF;   /* Bleu HUD / info */
-
-  /* Textes */
-  --text-primary:  #E6EDF3;   /* Blanc cassé */
-  --text-secondary:#8B949E;   /* Gris moyen */
-  --text-muted:    #484F58;   /* Gris sombre */
-
-  /* Borders */
-  --border-subtle: #21262D;
-  --border-muted:  #30363D;
-  --border-accent: #388BFD;
-
-  /* Outcomes */
-  --outcome-success:         #39D353;
-  --outcome-partial:         #E3A845;
-  --outcome-failure:         #CF222E;
-  --outcome-total-failure:   #8B0000;
-}
+/* Light : voir [data-theme="light"] — bg-pure/canvas, textes slate, status contrastés */
 ```
 
 ### Typographie
+- **Inter uniquement** (400 / 500 / 600 / 700) — plus d’Orbitron / JetBrains Mono
+- Échelle : display 36 / h1 28 / h2 24 / h3 20 / body-lg 16 / body 14 / caption 12 / overline 11
+- Overlines : UPPERCASE, letter-spacing 0.5px, muted ou amber
+- Rouge `#DC2626` : actions CTA uniquement — jamais décoratif passif
 
-```css
-/* Stack typographique */
---font-display: 'Orbitron', 'Rajdhani', sans-serif;  /* Titres, badges, callsigns */
---font-mono:    'JetBrains Mono', 'Courier New', monospace; /* Stats, chiffres, codes */
---font-body:    'Inter', 'DM Sans', sans-serif;       /* Corps de texte, labels */
-```
+### Composants
+- Radius default **8px**, cards : border-subtle + shadow level-1 + padding 24px
+- Primary button : crimson states (default / hover `#B91C1C` / active `#7F1D1D`)
+- Secondary : outlined, borders theme-aware
+- Inputs : focus **info blue**, error **status-error**
+- Badges HUD : success / warning / error / info / neutral (opacity 15% dark / 10% light)
+- Progress : hauteur 8px, fill `red-600`
 
-> **Import Google Fonts :** Orbitron (700) + JetBrains Mono (400, 500) + Inter (400, 500, 600)
+### Grille
+- Max width **1280px** (`max-w-content`), gutter 24px
+- Marges : 64px desktop / 32px tablet / 16px mobile
 
-### Composants UI clés
-
-#### Badge Outcome
-```
-[✅ SUCCÈS]     → bg vert transparent, border vert, texte vert
-[⚠️ PARTIEL]   → bg ambre transparent, border ambre, texte ambre
-[❌ ÉCHEC]      → bg rouge transparent, border rouge, texte rouge
-[💀 ÉCHEC TOT.]→ bg rouge sombre, border rouge sombre, texte rouge pâle
-```
-
-#### Card de vol
-```
-┌─────────────────────────────────────────────────┐
-│  [DCS]  F/A-18C Hornet          [SUCCÈS TOTAL] │
-│  Cpt. MAVERICK · [501st]                        │
-│  Mission : CAP Golfe — 1h 45min                │
-│  08/18/2026                              [→]   │
-└─────────────────────────────────────────────────┘
-```
-
-#### Bouton simulateur (radio stylisé)
-- Fond sombre + border muted à l'état normal
-- Border accent vert + glow subtil au hover / sélectionné
-- Icône/logo du simulateur à gauche du label
-
-### Effets visuels (subtils, non intrusifs)
-- `backdrop-filter: blur(8px)` sur les modals et overlays
-- Scanline texture très légère en CSS sur le header (`repeating-linear-gradient`)
-- Border radius très faible (2–4px) — style anguleux et militaire
-- Animations : fade-in uniquement, durée max 200ms
+### Surfaces couvertes par le DS
+Toutes les pages et shells futurs utilisent les mêmes tokens :
+- Dashboard, Log, Vols, Détail vol
+- Escadrilles (+ fiche), Pilotes (+ **fiche pilote** `/pilots/[id]`)
+- **Leaderboard** `/leaderboard`
+- **Auth PIN** : composant `AuthPinPanel` (shell UI, pas de logique auth branchée)
+- Toasts, dialogs, selectors, cards de vol
 
 ---
 
@@ -332,11 +307,21 @@ Shock Ultra (ULM), Volocopter 2X, Icon A5, Pipistrel Virus SW
 - Pagination : 20 vols par page
 - Chaque ligne = card compacte avec outcome badge coloré
 
-### 7.6 Leaderboard [FUTUR — structure à prévoir]
+### 7.6 Leaderboard
 - Classement pilotes : total heures, total vols, taux réussite
-- Classement escadrilles : mêmes métriques + top pilote de l'escadrille
-- Filtrable par simulateur
-- Période : all-time / 30 derniers jours / par année
+- Classement escadrilles : mêmes métriques
+- Page `/leaderboard` + API `/api/stats/leaderboard`
+- Filtres : période (all-time / 30j / année) et simulateur
+
+### 7.7 Fiche pilote
+- Page `/pilots/[id]` : stats (vols, heures, réussite) + derniers vols
+- Liens depuis liste pilotes, fiche escadrille, leaderboard
+
+### 7.8 Auth PIN (optionnel)
+- Champ `Pilot.pin` (4 chiffres, jamais exposé en API — flag `hasPin`)
+- Création pilote : PIN optionnel
+- Sélection pilote sur log/édition : modal `AuthPinPanel` + `POST /api/pilots/verify-pin`
+- Mode club trust inchangé si pas de PIN
 
 ---
 
@@ -359,7 +344,8 @@ GET    /api/aircraft         → Lister les avions (filtre ?game=DCS)
 POST   /api/aircraft         → Ajouter un avion manquant (isCustom: true)
 
 GET    /api/stats/dashboard  → Agrégats pour le dashboard
-GET    /api/stats/leaderboard→ [FUTUR] Classements
+GET    /api/stats/leaderboard→ Classements (period, game)
+POST   /api/pilots/verify-pin→ Vérifier PIN pilote
 ```
 
 ---
@@ -378,23 +364,33 @@ sim-pilot-logbook/
 │   │   ├── log/page.tsx         # Formulaire vol
 │   │   ├── flights/
 │   │   │   ├── page.tsx         # Liste vols
-│   │   │   └── [id]/page.tsx    # Détail vol
+│   │   │   └── [id]/
+│   │   │       ├── page.tsx     # Détail vol
+│   │   │       └── edit/page.tsx
 │   │   ├── squadrons/
 │   │   │   ├── page.tsx
 │   │   │   ├── new/page.tsx
 │   │   │   └── [id]/page.tsx
 │   │   ├── pilots/
 │   │   │   ├── page.tsx
-│   │   │   └── new/page.tsx
-│   │   ├── leaderboard/page.tsx # [FUTUR]
+│   │   │   ├── new/page.tsx
+│   │   │   └── [id]/page.tsx     # Fiche pilote
+│   │   ├── leaderboard/page.tsx  # Classements
 │   │   └── api/
 │   │       ├── flights/route.ts
 │   │       ├── squadrons/route.ts
 │   │       ├── pilots/route.ts
+│   │       ├── pilots/verify-pin/route.ts
 │   │       ├── aircraft/route.ts
-│   │       └── stats/dashboard/route.ts
+│   │       └── stats/
+│   │           ├── dashboard/route.ts
+│   │           └── leaderboard/route.ts
 │   ├── components/
-│   │   ├── ui/                  # shadcn/ui components
+│   │   ├── ui/                  # shadcn/ui components (Korea tokens)
+│   │   ├── theme-provider.tsx
+│   │   ├── theme-toggle.tsx
+│   │   ├── auth-pin-panel.tsx
+│   │   ├── flight-form.tsx      # Création + édition vol
 │   │   ├── flight-card.tsx
 │   │   ├── outcome-badge.tsx
 │   │   ├── game-selector.tsx
@@ -403,16 +399,18 @@ sim-pilot-logbook/
 │   │   ├── outcome-selector.tsx
 │   │   └── nav.tsx
 │   ├── lib/
-│   │   ├── prisma.ts            # Singleton Prisma Client
-│   │   ├── utils.ts             # cn(), formatDuration()...
-│   │   └── constants.ts        # GAMES, OUTCOMES, MISSION_TYPES
+│   │   ├── prisma.ts
+│   │   ├── utils.ts
+│   │   └── constants.ts
 │   └── styles/
-│       └── globals.css          # CSS tokens "Hangar Ops"
-├── public/
-│   └── fonts/                   # Orbitron, JetBrains Mono (si self-hosted)
-├── .env                         # DATABASE_URL="file:./dev.db"
+│       └── globals.css          # CSS tokens Korea v3.0 (dark + light)
+├── ASSETS/
+│   ├── simpilot_designsystem.md
+│   ├── design-system-sim-pilot-logbook.png
+│   └── design-system-light-mode.png
+├── .env
 ├── next.config.ts
-├── tailwind.config.ts           # Custom colors depuis tokens
+├── tailwind.config.ts           # Tokens Korea
 └── package.json
 ```
 
@@ -450,23 +448,26 @@ DATABASE_URL="file:./dev.db"
 
 ## 11. CONTRAINTES & RÈGLES CURSOR
 
-- **Pas d'auth** : aucun middleware de protection, aucune session, aucun JWT
+- **Pas d'auth obligatoire** : aucun middleware, aucune session, aucun JWT (PIN optionnel futur via `AuthPinPanel`)
 - **Déclaratif** : le pilote est sélectionné en début de formulaire, pas de compte
 - **SQLite uniquement** : ne pas migrer vers PostgreSQL sans demande explicite
 - **Tout en TypeScript strict** : pas de `any`, types Prisma générés utilisés partout
 - **Server Actions ou API Routes** : choisir l'un et être cohérent (préférer API Routes pour clarté)
 - **shadcn/ui uniquement** : pas d'autres librairies de composants (pas de MUI, pas de Chakra)
-- **CSS tokens d'abord** : toutes les couleurs via les variables CSS définies, pas de valeurs hardcodées
-- **Mobile-first** : responsive sur mobile (les pilotes logguent depuis leur téléphone)
+- **CSS tokens d'abord** : couleurs via variables Korea v3 (`globals.css`), pas de valeurs hardcodées
+- **Design System Korea v3** : dark + light, CTA crimson, amber nav, Inter seul, radius 8px
+- **Toute nouvelle page** (fiche, leaderboard, auth, admin) doit réutiliser les tokens / composants existants
+- **Mobile-first** : responsive sur mobile
 - **Pas de i18n** : application en français uniquement
 
 ---
 
-## 12. PHASES DE DÉVELOPPEMENT RECOMMANDÉES
+## 12. PHASES DE DÉVELOPPEMENT / CHECKLIST
 
-### Phase 1 — MVP (à développer maintenant)
+### Phase 1 — MVP
 - [x] Setup projet + Prisma + seed avions
-- [x] Layout global + Design System "Hangar Ops" (couleurs, typo, nav)
+- [x] Layout global + Design System Korea v3.0 (tokens, Inter, nav)
+- [x] Mode dark / light + toggle header
 - [x] Création escadrille + pilote
 - [x] Formulaire enregistrement vol (complet)
 - [x] Liste des vols avec filtres basiques
@@ -474,22 +475,30 @@ DATABASE_URL="file:./dev.db"
 
 ### Phase 2 — Enrichissement
 - [x] Page fiche escadrille avec stats
-- [ ] Page fiche pilote avec historique
-- [ ] Modification d'un vol
+- [x] Page fiche pilote avec historique
+- [x] Modification d'un vol (`/flights/[id]/edit`)
 - [x] Suppression d'un vol
 - [x] Ajout avion manquant (modal)
-- [ ] Export PDF ou CSV des vols
+- [x] Export / import CSV des vols
 
-### Phase 3 — Leaderboard [FUTUR]
-- [ ] Page classement pilotes
-- [ ] Page classement escadrilles
-- [ ] Filtres par période et simulateur
-- [ ] Calcul taux réussite et "kills" (avions perdus adversaires — si donnée ajoutée)
+### Phase 3 — Leaderboard & auth UI
+- [x] Page classement pilotes
+- [x] Page classement escadrilles
+- [x] Filtres leaderboard par période et simulateur
+- [x] Shell UI Auth PIN (`AuthPinPanel`) sous Korea v3
+- [x] Brancher logique PIN optionnelle par pilote
+
+### Phase Design System v3 (août 2026)
+- [x] Remplacer Hangar Ops → Korea v3.0
+- [x] Tokens dark + light dans `globals.css`
+- [x] Tailwind + composants shadcn alignés
+- [x] Progress bars crimson, badges HUD, typo Inter
+- [x] Docs / briefing / README à jour
 
 ---
 
 > **Note d'implémentation :** Prisma 5 + SQLite ne supporte pas les enums natifs. `Game` et `Outcome` sont stockés en `String` et validés côté TypeScript / Zod (`src/lib/constants.ts`).
 
-*Briefing rédigé pour Cursor — Projet Sim Pilot Logbook v1.0*
+*Briefing Sim Pilot Logbook — Design System Korea v3.0 (août 2026)*
 *Stack : Next.js 14 + Prisma + SQLite + shadcn/ui + Tailwind CSS*
 *Déploiement : Apply.Build*

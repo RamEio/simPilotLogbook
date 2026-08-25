@@ -1,26 +1,15 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Inter, JetBrains_Mono, Barlow_Condensed } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import { Nav } from "@/components/nav";
+import { ThemeProvider } from "@/components/theme-provider";
 import "@/styles/globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-inter",
-});
-
-const barlowCondensed = Barlow_Condensed({
-  subsets: ["latin"],
-  weight: ["600"],
-  variable: "--font-barlow-condensed",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-jetbrains",
 });
 
 export const metadata: Metadata = {
@@ -29,31 +18,42 @@ export const metadata: Metadata = {
     "Carnet de vol collaboratif multi-simulateurs pour un petit groupe de pilotes.",
 };
 
+const themeInitScript = `
+(function() {
+  try {
+    var stored = localStorage.getItem('spl-theme');
+    var theme = stored === 'light' || stored === 'dark' ? stored : 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
   return (
-    <html
-      lang="fr"
-      className={`${inter.variable} ${barlowCondensed.variable} ${jetbrains.variable}`}
-    >
-      <body className="min-h-screen bg-bg-primary font-body text-ink-primary antialiased">
-        <Nav />
-        <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
-        <Toaster
-          theme="light"
-          position="bottom-right"
-          toastOptions={{
-            style: {
-              background: "#d6dae0",
-              border: "2px solid #8a929c",
-              color: "#1a1e24",
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-            },
-          }}
-        />
+    <html lang="fr" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="min-h-screen bg-bg-deep font-sans text-ink-primary antialiased">
+        <ThemeProvider>
+          <Nav />
+          <main className="mx-auto max-w-content px-4 py-6 md:px-8 lg:px-16">
+            {children}
+          </main>
+          <Toaster
+            theme="system"
+            position="bottom-right"
+            toastOptions={{
+              className: "border border-line-default bg-bg-card text-ink-primary",
+            }}
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

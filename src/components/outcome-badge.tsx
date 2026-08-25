@@ -1,16 +1,17 @@
-import type { Game, Outcome } from "@/lib/constants";
+import type { Outcome } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { outcomeMeta } from "@/lib/constants";
 
 const styles: Record<Outcome, string> = {
-  SUCCESS: "border-outcome-success bg-outcome-success text-white",
+  SUCCESS:
+    "border-status-success/30 bg-status-success/15 text-status-success",
   PARTIAL_AIRCRAFT:
-    "border-outcome-partial bg-outcome-partial text-white",
+    "border-status-warning/30 bg-status-warning/15 text-status-warning",
   PARTIAL_PILOT:
-    "border-outcome-partial bg-outcome-partial text-white",
-  FAILURE: "border-outcome-failure bg-outcome-failure text-white",
+    "border-status-warning/30 bg-status-warning/15 text-status-warning",
+  FAILURE: "border-status-error/30 bg-status-error/15 text-status-error",
   TOTAL_FAILURE:
-    "border-outcome-total-failure bg-outcome-total-failure text-white",
+    "border-crimson-900/40 bg-crimson-900/40 text-crimson-400",
 };
 
 export function OutcomeBadge({ outcome }: { outcome: string }) {
@@ -18,7 +19,7 @@ export function OutcomeBadge({ outcome }: { outcome: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-sm border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider",
+        "inline-flex items-center gap-1 rounded-pill border px-2.5 py-0.5 text-overline font-medium uppercase tracking-overline",
         styles[outcome as Outcome] ?? styles.SUCCESS,
       )}
     >

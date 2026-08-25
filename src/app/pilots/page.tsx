@@ -1,11 +1,17 @@
 import Link from "next/link";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { pilotStatusMeta } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
+
+function statusBadgeVariant(status: string) {
+  if (status === "ACTIVE") return "success" as const;
+  return "error" as const;
+}
 
 export default async function PilotsPage() {
   const pilots = await prisma.pilot.findMany({
@@ -18,12 +24,11 @@ export default async function PilotsPage() {
 
   return (
     <div className="space-y-6 fade-in">
+      <Breadcrumbs items={[{ label: "Pilotes" }]} />
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink-muted">
-            Ops / Pilots
-          </p>
-          <h1 className="mt-1 font-display text-2xl tracking-wider">Pilotes</h1>
+          <p className="overline overline-amber">Ops / Pilots</p>
+          <h1 className="mt-1 text-h1 text-ink-primary">Pilotes</h1>
         </div>
         <Button asChild>
           <Link href="/pilots/new">Créer</Link>
@@ -33,33 +38,22 @@ export default async function PilotsPage() {
         {pilots.length === 0 ? (
           <p className="text-sm text-ink-secondary">Aucun pilote.</p>
         ) : (
-          pilots.map((pilot) => {
-            const outOfCombat = pilot.status === "OUT_OF_COMBAT";
-            return (
-              <Card
-                key={pilot.id}
-                className={cn(outOfCombat && "opacity-50 grayscale")}
-              >
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span>{pilot.callsign ?? pilot.name}</span>
-                    {outOfCombat ? (
-                      <Badge variant="destructive" className="text-[10px]">
-                        H.C.
-                      </Badge>
-                    ) : (
-                      <Badge variant="success" className="text-[10px]">
-                        Vivant
-                      </Badge>
-                    )}
-                  </CardTitle>
+          pilots.map((pilot) => (
+            <Link key={pilot.id} href={`/pilots/${pilot.id}`}>
+              <Card className="transition-colors hover:border-line-default hover:bg-bg-hover">
+                <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
+                  <CardTitle>{pilot.callsign ?? pilot.name}</CardTitle>
+                  <Badge variant={statusBadgeVariant(pilot.status)}>
+                    {pilotStatusMeta(pilot.status).label}
+                  </Badge>
                 </CardHeader>
                 <CardContent className="text-sm text-ink-secondary">
-                  {pilot.squadron.tag ?? pilot.squadron.name} · {pilot._count.flights} vols
+                  {pilot.squadron.tag ?? pilot.squadron.name} ·{" "}
+                  {pilot._count.flights} vols
                 </CardContent>
               </Card>
-            );
-          })
+            </Link>
+          ))
         )}
       </div>
     </div>

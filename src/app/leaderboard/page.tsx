@@ -1,0 +1,184 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { apiFetch } from "@/lib/api";
+import { GAMES, type Game } from "@/lib/constants";
+import { formatHours } from "@/lib/utils";
+
+type PilotRank = {
+  id: string;
+  name: string;
+  callsign: string | null;
+  squadronName: string;
+  flights: number;
+  minutes: number;
+  successRate: number;
+};
+
+type SquadronRank = {
+  id: string;
+  name: string;
+  tag: string | null;
+  flights: number;
+  minutes: number;
+  successRate: number;
+};
+
+type LeaderboardResponse = {
+  period: string;
+  game: string;
+  pilots: PilotRank[];
+  squadrons: SquadronRank[];
+};
+
+export default function LeaderboardPage() {
+  const [period, setPeriod] = useState("all");
+  const [game, setGame] = useState<Game | "all">("all");
+  const [data, setData] = useState<LeaderboardResponse | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    params.set("period", period);
+    if (game !== "all") {
+      params.set("game", game);
+    }
+    void apiFetch<LeaderboardResponse>(
+      `/api/stats/leaderboard?${params.toString()}`,
+    ).then(setData);
+  }, [period, game]);
+
+  return (
+    <div className="space-y-6 fade-in">
+      <Breadcrumbs items={[{ label: "Classements" }]} />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="overline overline-amber">Ops / Leaderboard</p>
+          <h1 className="mt-1 text-h1 text-ink-primary">Classements</h1>
+          <p className="mt-1 max-w-xl text-sm text-ink-secondary">
+            Palmarès des pilotes et escadrilles — heures, sorties, taux de
+            réussite.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Select value={period} onValueChange={setPeriod}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Période" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All-time</SelectItem>
+              <SelectItem value="30d">30 derniers jours</SelectItem>
+              <SelectItem value="year">Cette année</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={game}
+            onValueChange={(value) => setGame(value as Game | "all")}
+          >
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Simulateur" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous simulateurs</SelectItem>
+              {GAMES.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.short}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Pilotes</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {!data?.pilots.length ? (
+              <p className="text-sm text-ink-secondary">
+                Aucun vol pour ces filtres.
+              </p>
+            ) : (
+              data.pilots.map((pilot, index) => (
+                <Link
+                  key={pilot.id}
+                  href={`/pilots/${pilot.id}`}
+                  className="flex items-center justify-between gap-3 rounded border border-line-subtle bg-bg-elevated px-3 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-default hover:bg-bg-hover"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Badge variant={index < 3 ? "warning" : "neutral"}>
+                      #{index + 1}
+                    </Badge>
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-ink-primary">
+                        {pilot.callsign ?? pilot.name}
+                      </p>
+                      <p className="text-caption text-ink-muted">
+                        {pilot.squadronName}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="shrink-0 text-right text-caption text-ink-secondary">
+                    <p>{formatHours(pilot.minutes)}</p>
+                    <p>
+                      {pilot.flights} vols · {pilot.successRate}%
+                    </p>
+                  </div>
+                </Link>
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Escadrilles</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {!data?.squadrons.length ? (
+              <p className="text-sm text-ink-secondary">
+                Aucun vol pour ces filtres.
+              </p>
+            ) : (
+              data.squadrons.map((squadron, index) => (
+                <Link
+                  key={squadron.id}
+                  href={`/squadrons/${squadron.id}`}
+                  className="flex items-center justify-between gap-3 rounded border border-line-subtle bg-bg-elevated px-3 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-default hover:bg-bg-hover"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Badge variant={index < 3 ? "warning" : "neutral"}>
+                      #{index + 1}
+                    </Badge>
+                    <p className="truncate font-medium text-ink-primary">
+                      {squadron.tag ? `${squadron.tag} ` : ""}
+                      {squadron.name}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right text-caption text-ink-secondary">
+                    <p>{formatHours(squadron.minutes)}</p>
+                    <p>
+                      {squadron.flights} vols · {squadron.successRate}%
+                    </p>
+                  </div>
+                </Link>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

@@ -37,6 +37,9 @@ L'app est packagée en Docker (`Dockerfile`) pour Apply.Build, un PaaS européen
 
 SQLite vit dans le conteneur : un redéploiement peut réinitialiser les vols. Le seed des avions est idempotent.
 
-## Spec produit
+## Spec produit & design
 
-La fiche de briefing à jour se trouve dans [`cursor_briefing_flight_logbook.md`](./cursor_briefing_flight_logbook.md).
+- Briefing : [`cursor_briefing_flight_logbook.md`](./cursor_briefing_flight_logbook.md)
+- Design system Korea v3.0 : [`ASSETS/simpilot_designsystem.md`](./ASSETS/simpilot_designsystem.md)
+
+L’UI est **dark-first** avec un **mode light** (icône en haut à droite). Tokens CSS dans `src/styles/globals.css`.

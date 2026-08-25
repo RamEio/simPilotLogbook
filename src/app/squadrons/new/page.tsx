@@ -3,24 +3,23 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { IconPicker } from "@/components/icon-picker";
 import { apiFetch } from "@/lib/api";
 
 export default function NewSquadronPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [tag, setTag] = useState("");
-  const [icon, setIcon] = useState("shield");
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     try {
       const created = await apiFetch<{ id: string }>("/api/squadrons", {
         method: "POST",
-        body: JSON.stringify({ name, tag: tag || null, icon }),
+        body: JSON.stringify({ name, tag: tag || null }),
       });
       toast.success("Escadrille créée");
       router.push(`/squadrons/${created.id}`);
@@ -31,9 +30,14 @@ export default function NewSquadronPage() {
 
   return (
     <form className="mx-auto max-w-md space-y-4 fade-in" onSubmit={(event) => void onSubmit(event)}>
-      <h1 className="font-display text-2xl uppercase tracking-wider text-accent-primary">
-        Nouvelle escadrille
-      </h1>
+      <Breadcrumbs
+        items={[
+          { label: "Escadrilles", href: "/squadrons" },
+          { label: "Nouvelle" },
+        ]}
+      />
+      <p className="overline overline-amber">Ops / Squadrons</p>
+      <h1 className="mt-1 text-h1 text-ink-primary">Nouvelle escadrille</h1>
       <div className="space-y-2">
         <Label htmlFor="name">Nom</Label>
         <Input id="name" value={name} onChange={(event) => setName(event.target.value)} required />
@@ -46,10 +50,6 @@ export default function NewSquadronPage() {
           onChange={(event) => setTag(event.target.value)}
           placeholder="[501st]"
         />
-      </div>
-      <div className="space-y-2">
-        <Label>Insigne</Label>
-        <IconPicker value={icon} onChange={setIcon} />
       </div>
       <Button type="submit" className="w-full">
         Créer

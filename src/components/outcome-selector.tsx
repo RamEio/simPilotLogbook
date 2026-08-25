@@ -21,10 +21,10 @@ export function OutcomeSelector({
             type="button"
             onClick={() => onChange(outcome.value)}
             className={cn(
-              "rounded-md border px-3 py-3 text-left transition-colors duration-200",
+              "rounded border px-3 py-3 text-left transition-colors duration-200",
               selected
-                ? "border-accent-green bg-accent-green/10"
-                : "border-line-muted bg-bg-elevated hover:border-line-accent",
+                ? "border-crimson-600 bg-crimson-600/10"
+                : "border-line-default bg-bg-elevated hover:border-line-strong hover:bg-bg-hover",
             )}
           >
             <p className="text-sm text-ink-primary">

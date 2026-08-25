@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { OutcomeBadge } from "@/components/outcome-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,9 +56,14 @@ export default function FlightDetailPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 fade-in">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink-muted">
-        Ops / Flight
-      </p>
+      <Breadcrumbs
+        items={[
+          { label: "Vols", href: "/flights" },
+          { label: flight.aircraft.name },
+        ]}
+      />
+      <p className="overline overline-amber">Ops / Flight</p>
+      <h1 className="sr-only">Détail du vol</h1>
       <Card>
         <CardHeader className="flex flex-row items-start justify-between gap-3">
           <div>
@@ -78,7 +84,10 @@ export default function FlightDetailPage() {
           {flight.notes ? <p>Notes : {flight.notes}</p> : null}
         </CardContent>
       </Card>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
+        <Button asChild>
+          <Link href={`/flights/${flight.id}/edit`}>Modifier</Link>
+        </Button>
         <Button asChild variant="secondary">
           <Link href="/log">Nouveau vol</Link>
         </Button>

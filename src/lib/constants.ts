@@ -78,10 +78,28 @@ export const MISSION_TYPES = [
 
 export type MissionType = (typeof MISSION_TYPES)[number];
 
+export const PILOT_STATUS_VALUES = ["ACTIVE", "OUT_OF_ACTION"] as const;
+
+export type PilotStatus = (typeof PILOT_STATUS_VALUES)[number];
+
+export const PILOT_STATUSES: {
+  value: PilotStatus;
+  label: string;
+}[] = [
+  { value: "ACTIVE", label: "Actif" },
+  { value: "OUT_OF_ACTION", label: "Hors comb." },
+];
+
 export function gameLabel(game: string): string {
   return GAMES.find((item) => item.value === game)?.short ?? game;
 }
 
 export function outcomeMeta(outcome: string) {
   return OUTCOMES.find((item) => item.value === outcome) ?? OUTCOMES[0];
+}
+
+export function pilotStatusMeta(status: string) {
+  return (
+    PILOT_STATUSES.find((item) => item.value === status) ?? PILOT_STATUSES[0]
+  );
 }

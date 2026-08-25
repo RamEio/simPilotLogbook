@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { Game, Outcome } from "@/lib/constants";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { FlightCard, type FlightCardData } from "@/components/flight-card";
 import { Button } from "@/components/ui/button";
 import {
@@ -97,12 +98,11 @@ export default function FlightsPage() {
 
   return (
     <div className="space-y-6 fade-in">
+      <Breadcrumbs items={[{ label: "Vols" }]} />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink-muted">
-            Ops / Flights
-          </p>
-          <h1 className="mt-1 font-display text-2xl tracking-wider">Vols</h1>
+          <p className="overline overline-amber">Ops / Flights</p>
+          <h1 className="mt-1 text-h1 text-ink-primary">Vols</h1>
           <p className="mt-1 max-w-xl text-sm text-ink-secondary">
             Exporte le carnet en CSV (à garder hors du serveur). Après un rebuild
             Apply.Build, réimporte ce fichier pour restaurer les vols.
@@ -243,7 +243,7 @@ export default function FlightsPage() {
           >
             Précédent
           </Button>
-          <p className="font-mono text-xs text-ink-muted">
+          <p className="text-caption text-ink-muted">
             {data.page} / {data.pageCount}
           </p>
           <Button

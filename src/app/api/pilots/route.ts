@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { handleError, jsonError } from "@/lib/http";
+import { handleError, jsonError, toPublicPilot } from "@/lib/http";
 
 const createPilotSchema = z.object({
   name: z.string().trim().min(1, "Nom requis"),
   callsign: z.string().trim().optional().nullable(),
   squadronId: z.string().min(1, "Escadrille requise"),
+  pin: z
+    .string()
+    .regex(/^\d{4}$/, "PIN : 4 chiffres")
+    .optional()
+    .nullable(),
 });
 
 export async function GET(request: NextRequest) {
@@ -17,7 +22,7 @@ export async function GET(request: NextRequest) {
       include: { squadron: true },
       orderBy: { name: "asc" },
     });
-    return NextResponse.json(pilots);
+    return NextResponse.json(pilots.map(toPublicPilot));
   } catch (error) {
     return handleError(error);
   }
@@ -37,11 +42,12 @@ export async function POST(request: NextRequest) {
       data: {
         name: body.name,
         callsign: body.callsign || undefined,
+        pin: body.pin || undefined,
         squadronId: body.squadronId,
       },
       include: { squadron: true },
     });
-    return NextResponse.json(pilot, { status: 201 });
+    return NextResponse.json(toPublicPilot(pilot), { status: 201 });
   } catch (error) {
     return handleError(error);
   }

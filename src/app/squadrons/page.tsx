@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SquadronIcon } from "@/components/icons/squadron-icons";
@@ -14,14 +15,11 @@ export default async function SquadronsPage() {
 
   return (
     <div className="space-y-6 fade-in">
+      <Breadcrumbs items={[{ label: "Escadrilles" }]} />
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink-muted">
-            Ops / Squadrons
-          </p>
-          <h1 className="mt-1 font-display text-2xl tracking-wider">
-            Escadrilles
-          </h1>
+          <p className="overline overline-amber">Ops / Squadrons</p>
+          <h1 className="mt-1 text-h1 text-ink-primary">Escadrilles</h1>
         </div>
         <Button asChild>
           <Link href="/squadrons/new">Créer</Link>
@@ -33,7 +31,7 @@ export default async function SquadronsPage() {
         ) : (
           squadrons.map((squadron) => (
             <Link key={squadron.id} href={`/squadrons/${squadron.id}`}>
-              <Card className="transition-colors hover:border-line-accent">
+              <Card className="transition-colors hover:border-line-default hover:bg-bg-hover">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <SquadronIcon icon={squadron.icon} className="h-5 w-5 shrink-0" />
@@ -43,7 +41,7 @@ export default async function SquadronsPage() {
                     </span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="font-mono text-xs text-ink-muted">
+                <CardContent className="text-caption text-ink-muted">
                   {squadron._count.pilots} pilotes · {squadron._count.flights} vols
                 </CardContent>
               </Card>

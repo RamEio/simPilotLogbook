@@ -2,7 +2,6 @@
 
 import type { Game } from "@/lib/constants";
 import { GAMES } from "@/lib/constants";
-import { GameIcon } from "@/components/icons/game-icons";
 import { cn } from "@/lib/utils";
 
 export function GameSelector({
@@ -22,14 +21,13 @@ export function GameSelector({
             type="button"
             onClick={() => onChange(game.value)}
             className={cn(
-              "rounded-md border px-3 py-3 text-left text-sm transition-colors duration-200",
+              "rounded border px-3 py-3 text-left text-sm transition-colors duration-200",
               selected
-                ? "border-accent-green bg-accent-green/10 text-accent-green shadow-glow"
-                : "border-line-muted bg-bg-elevated text-ink-secondary hover:border-accent-green",
+                ? "border-crimson-600 bg-crimson-600/10 text-crimson-600"
+                : "border-line-default bg-bg-elevated text-ink-secondary hover:border-line-strong hover:bg-bg-hover",
             )}
           >
-            <GameIcon game={game.value} className="mx-auto h-5 w-5" />
-            <span className="mt-1 font-display text-xs tracking-wider">
+            <span className="text-xs font-semibold tracking-overline">
               {game.short}
             </span>
           </button>

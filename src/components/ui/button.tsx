@@ -4,19 +4,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm text-sm font-display uppercase tracking-wider transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded text-sm font-medium transition-colors duration-200 focus-visible:outline-none disabled:pointer-events-none",
   {
     variants: {
       variant: {
         default:
-          "bg-accent-primary text-white hover:bg-accent-primary-hover shadow-kneeboard",
+          "bg-crimson-600 text-white hover:bg-crimson-700 active:translate-y-px active:bg-crimson-900 focus-visible:ring-2 focus-visible:ring-crimson-400 disabled:bg-ink-disabled disabled:text-ink-muted",
         secondary:
-          "bg-white/50 text-accent-primary-text border-2 border-accent-primary hover:bg-accent-primary hover:text-white",
+          "border border-line-default bg-transparent text-ink-primary hover:bg-bg-hover hover:border-line-strong active:translate-y-px active:bg-bg-card focus-visible:ring-2 focus-visible:ring-status-info disabled:border-line-subtle disabled:text-ink-disabled",
         outline:
-          "border-2 border-line-muted bg-transparent text-ink-primary hover:border-accent-primary",
-        ghost: "text-ink-secondary hover:bg-bg-elevated hover:text-ink-primary",
-        destructive: "bg-accent-red text-white hover:bg-accent-red/90",
-        link: "text-accent-blue underline-offset-4 hover:underline normal-case tracking-normal",
+          "border border-line-default bg-transparent text-ink-primary hover:bg-bg-hover focus-visible:ring-2 focus-visible:ring-status-info",
+        ghost:
+          "text-ink-secondary hover:bg-bg-hover hover:text-ink-primary focus-visible:ring-2 focus-visible:ring-status-info",
+        destructive:
+          "bg-crimson-600 text-white hover:bg-crimson-700 active:bg-crimson-900 focus-visible:ring-2 focus-visible:ring-crimson-400",
+        link: "text-status-info underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",
