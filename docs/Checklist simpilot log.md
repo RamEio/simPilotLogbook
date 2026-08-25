@@ -27,7 +27,7 @@
 
 - [x] Bandeau image pleine largeur (aspect naturel)
 - [x] Menu aligné en haut du bandeau (pas centré verticalement)
-- [x] Header **non sticky** (le contenu ne passe plus dessous au scroll)
+- [x] Header image **non sticky** ; barre de nav **sticky** décorrélée de l’image
 - [x] Titre « Sim Pilot Logbook » à gauche (sans sous-titre Korea Ops)
 - [x] Fil d’Ariane cliquable sur toutes les pages (`Breadcrumbs`)
 - [x] Headers synchronisés depuis `ASSETS/header_darkmode.png` et `ASSETS/header_lightmode.png`
@@ -91,35 +91,37 @@
 
 ## À faire / backlog
 
-- [ ] **Discussion en pause** — voir section « Parking produit » ci-dessous
-- [ ] Filtres leaderboard avancés (tri + escadrille + statut) — pilotes **et** escadrilles
-- [ ] Kills par vol : Aérien / Ground / Naval / Building (+ CSV + classements)
+- [ ] Filtres leaderboard avancés (escadrille + statut Actif/tous)
 - [ ] Passe UI cards pilote homogènes (DS Korea + reviewer UX)
 - [ ] Édition vol : confirmation visuelle plus forte post-save
 - [ ] Accessibilité : audit WCAG focus order / contrastes light mode
-- [x] Déployer les changements DS + statut pilote sur Apply.Build *(push `9846e33` — build cassé, fix constantes en cours)*
+- [x] Favicon LOG bleu nuit
+- [x] Kills par vol + points + 5 classements
+- [x] Nav sticky décorrélée de l’image
+- [x] Déployer DS + statut pilote sur Apply.Build
 - [x] Sync assets header en prod (`public/header-*.png`)
 
-## Parking produit — discussion 25/08/2026 (à reprendre)
+## Parking produit — discussion 25/08/2026
 
-**Contexte :** après Korea v3, on a discuté la suite leaderboard / kills / UI pilotes. Pause pour corriger le build Apply.Build.
+**Contexte :** suite Korea v3 — leaderboard / kills / UI pilotes.
 
-### Décisions validées en discussion
-- Classer **pilotes et escadrilles** (déjà présent sur `/leaderboard` ; enrichir filtres/tri)
-- Filtres envisagés v1 : **tri** (heures / vols / réussite) + **escadrille** + **statut** (Actif / tous)
-- **Kills** intéressants : 4 catégories par pilote via les vols — **Aérien, Ground, Naval, Building**
-- Passe **cards pilote** partout pour homogénéité DS + `ASSETS/cursor_ux_ui_product_reviewer_improved.md`
+### Décisions validées
+- Classer **pilotes et escadrilles**
+- **Kills par vol** (optionnels, défaut 0) ; compteurs pilote = cumul des vols
+- 5 classements : Aérien / Naval / Sol / Building / **Points**
+- Règle points : Aérien 5 · Naval 4 · Sol 3 · Building 2 · 1 h de vol 1
+- Favicon onglet : « LOG » sur carré bleu nuit
+- Nav sticky décorrélée de l’image hero
 
-### Ouvert (à trancher au retour)
-1. Saisie kills : **par vol** (recommandé) ou total manuel fiche pilote ?
-2. Leaderboard kills : **total global** d’abord, ou 4 classements séparés ?
-3. Kills optionnels (défaut 0) — oui recommandé pour ne pas freiner le log
+### Encore ouvert / suite
+- [ ] Filtres leaderboard avancés (tri + escadrille + statut)
+- [ ] Composant `PilotCard`/`PilotRow` unique (homogénéité UI)
 
-### Phasage proposé au retour
-1. Fix déploiement / stabilité
-2. Filtres leaderboard v1
-3. Schéma + UI kills + CSV
-4. Composant `PilotCard`/`PilotRow` unique
+### Phasage
+1. ~~Fix déploiement~~
+2. ~~Kills + points + classements~~ *(implémenté)*
+3. Filtres leaderboard v1
+4. Passe UI cards pilote
 
 ---
 

@@ -33,6 +33,10 @@ export async function GET() {
         flight.missionName,
         flight.outcome,
         flight.notes,
+        flight.killsAir,
+        flight.killsNaval,
+        flight.killsGround,
+        flight.killsBuilding,
       ]),
     ])}`;
 

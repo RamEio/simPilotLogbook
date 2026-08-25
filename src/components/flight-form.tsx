@@ -29,6 +29,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { apiFetch } from "@/lib/api";
 import { MISSION_TYPES } from "@/lib/constants";
+import { KILL_CATEGORIES, POINTS_RULES_LABEL } from "@/lib/scoring";
 
 type Squadron = { id: string; name: string; tag: string | null };
 type Pilot = {
@@ -50,6 +51,10 @@ export type FlightFormInitial = {
   missionType: string | null;
   outcome: Outcome;
   notes: string | null;
+  killsAir: number;
+  killsNaval: number;
+  killsGround: number;
+  killsBuilding: number;
 };
 
 export function FlightForm({
@@ -77,6 +82,12 @@ export function FlightForm({
   const [missionType, setMissionType] = useState(initial?.missionType ?? "");
   const [outcome, setOutcome] = useState<Outcome | "">(initial?.outcome ?? "");
   const [notes, setNotes] = useState(initial?.notes ?? "");
+  const [killsAir, setKillsAir] = useState(initial?.killsAir ?? 0);
+  const [killsNaval, setKillsNaval] = useState(initial?.killsNaval ?? 0);
+  const [killsGround, setKillsGround] = useState(initial?.killsGround ?? 0);
+  const [killsBuilding, setKillsBuilding] = useState(
+    initial?.killsBuilding ?? 0,
+  );
   const [submitting, setSubmitting] = useState(false);
   const [hydrated, setHydrated] = useState(mode === "create");
   const [verifiedPilotId, setVerifiedPilotId] = useState<string | null>(
@@ -281,6 +292,10 @@ export function FlightForm({
         missionType: missionType || null,
         outcome,
         notes: notes || null,
+        killsAir,
+        killsNaval,
+        killsGround,
+        killsBuilding,
       };
 
       if (mode === "edit" && initial) {
@@ -457,6 +472,48 @@ export function FlightForm({
         <div className="space-y-2">
           <Label>Résultat</Label>
           <OutcomeSelector value={outcome} onChange={setOutcome} />
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <Label>Kills (optionnel)</Label>
+            <p className="mt-1 text-caption text-ink-muted">{POINTS_RULES_LABEL}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {(
+              [
+                { key: "killsAir", value: killsAir, set: setKillsAir },
+                { key: "killsNaval", value: killsNaval, set: setKillsNaval },
+                { key: "killsGround", value: killsGround, set: setKillsGround },
+                {
+                  key: "killsBuilding",
+                  value: killsBuilding,
+                  set: setKillsBuilding,
+                },
+              ] as const
+            ).map((field) => {
+              const meta = KILL_CATEGORIES.find((c) => c.key === field.key)!;
+              return (
+                <div key={field.key} className="space-y-1.5">
+                  <Label htmlFor={field.key} className="text-caption">
+                    {meta.label}
+                    <span className="ml-1 text-ink-muted">({meta.points} pts)</span>
+                  </Label>
+                  <Input
+                    id={field.key}
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={field.value}
+                    onChange={(event) => {
+                      const next = Number.parseInt(event.target.value, 10);
+                      field.set(Number.isFinite(next) && next >= 0 ? next : 0);
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         <div className="space-y-2">

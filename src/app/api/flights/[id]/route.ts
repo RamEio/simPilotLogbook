@@ -4,6 +4,8 @@ import { GAME_VALUES, OUTCOME_VALUES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { flightInclude, handleError, jsonError } from "@/lib/http";
 
+const killCountSchema = z.number().int().min(0).optional();
+
 const updateFlightSchema = z.object({
   date: z.string().optional(),
   pilotId: z.string().min(1).optional(),
@@ -15,6 +17,10 @@ const updateFlightSchema = z.object({
   missionName: z.string().optional().nullable(),
   outcome: z.enum(OUTCOME_VALUES).optional(),
   notes: z.string().optional().nullable(),
+  killsAir: killCountSchema,
+  killsNaval: killCountSchema,
+  killsGround: killCountSchema,
+  killsBuilding: killCountSchema,
 });
 
 type RouteContext = { params: { id: string } };

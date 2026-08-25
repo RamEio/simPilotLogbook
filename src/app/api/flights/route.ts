@@ -5,6 +5,8 @@ import { GAME_VALUES, OUTCOME_VALUES, type Game, type Outcome } from "@/lib/cons
 import { prisma } from "@/lib/prisma";
 import { flightInclude, handleError, jsonError } from "@/lib/http";
 
+const killCountSchema = z.number().int().min(0).optional().default(0);
+
 const createFlightSchema = z.object({
   date: z.string().optional(),
   pilotId: z.string().min(1),
@@ -16,6 +18,10 @@ const createFlightSchema = z.object({
   missionName: z.string().optional().nullable(),
   outcome: z.enum(OUTCOME_VALUES),
   notes: z.string().optional().nullable(),
+  killsAir: killCountSchema,
+  killsNaval: killCountSchema,
+  killsGround: killCountSchema,
+  killsBuilding: killCountSchema,
 });
 
 export async function GET(request: NextRequest) {
@@ -107,6 +113,10 @@ export async function POST(request: NextRequest) {
         missionName: body.missionName ?? undefined,
         outcome: body.outcome,
         notes: body.notes ?? undefined,
+        killsAir: body.killsAir,
+        killsNaval: body.killsNaval,
+        killsGround: body.killsGround,
+        killsBuilding: body.killsBuilding,
       },
       include: flightInclude,
     });

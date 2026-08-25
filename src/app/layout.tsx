@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "Sim Pilot Logbook",
   description:
     "Carnet de vol collaboratif multi-simulateurs pour un petit groupe de pilotes.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
 };
 
 const themeInitScript = `

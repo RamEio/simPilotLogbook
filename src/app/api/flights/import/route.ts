@@ -95,6 +95,10 @@ export async function POST(request: NextRequest) {
           missionName: row.mission_name || undefined,
           outcome: row.outcome,
           notes: row.notes || undefined,
+          killsAir: parseKill(row.kills_air),
+          killsNaval: parseKill(row.kills_naval),
+          killsGround: parseKill(row.kills_ground),
+          killsBuilding: parseKill(row.kills_building),
         },
       });
       created += 1;
@@ -120,4 +124,11 @@ export async function POST(request: NextRequest) {
     }
     return handleError(error);
   }
+}
+
+function parseKill(value: string): number {
+  if (!value.trim()) return 0;
+  const n = Number.parseInt(value, 10);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return n;
 }

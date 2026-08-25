@@ -26,8 +26,93 @@ export function Nav() {
     theme === "light" ? "/header-light.png" : "/header-dark.png";
 
   return (
-    <header className="relative z-10 w-full border-b border-line-subtle">
-      <div className="relative w-full">
+    <header className="relative z-20 w-full">
+      {/* Chrome sticky — décorrélé de l’image hero */}
+      <div className="sticky top-0 z-30 border-b border-line-subtle bg-bg-elevated/95 backdrop-blur-md">
+        <div className="mx-auto flex w-full max-w-content items-center justify-between gap-3 px-4 py-3 md:px-8 md:py-3.5 lg:px-16">
+          <Link
+            href="/"
+            className="shrink-0 text-overline font-medium uppercase tracking-overline text-ink-muted transition-colors hover:text-ink-primary"
+          >
+            Accueil
+          </Link>
+
+          <nav
+            className="hidden items-center gap-1 md:flex"
+            aria-label="Navigation principale"
+          >
+            {links.map((link) => {
+              const active =
+                link.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "rounded px-3 py-2 text-sm transition-colors duration-200",
+                    active
+                      ? "nav-active bg-bg-card font-medium"
+                      : "text-ink-secondary hover:bg-bg-hover hover:text-ink-primary",
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              type="button"
+              className="text-ink-primary md:hidden"
+              onClick={() => setOpen((current) => !current)}
+              aria-label="Menu"
+              aria-expanded={open}
+            >
+              {open ? (
+                <X className="h-5 w-5" strokeWidth={1.5} />
+              ) : (
+                <Menu className="h-5 w-5" strokeWidth={1.5} />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {open ? (
+          <nav
+            className="grid gap-1 border-t border-line-subtle px-4 py-3 md:hidden"
+            aria-label="Navigation mobile"
+          >
+            {links.map((link) => {
+              const active =
+                link.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "rounded px-2 py-2 text-sm",
+                    active
+                      ? "nav-active bg-bg-card"
+                      : "text-ink-secondary hover:bg-bg-hover hover:text-ink-primary",
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+        ) : null}
+      </div>
+
+      {/* Hero image — scroll normal, branding only */}
+      <div className="relative w-full border-b border-line-subtle">
         <Image
           key={headerSrc}
           src={headerSrc}
@@ -41,59 +126,8 @@ export function Nav() {
 
         <div className="header-scrim absolute inset-0" aria-hidden />
 
-        <div className="absolute inset-0 flex flex-col">
-          {/* Chrome : navigation seule — le branding vit dans le hero */}
-          <div className="mx-auto flex w-full max-w-content items-center justify-end gap-3 px-4 py-3 md:justify-between md:px-8 md:py-4 lg:px-16">
-            <Link
-              href="/"
-              className="mr-auto text-overline font-medium uppercase tracking-overline text-white/80 transition-colors hover:text-white md:mr-0"
-            >
-              Accueil
-            </Link>
-
-            <nav className="hidden items-center gap-1 md:flex" aria-label="Navigation principale">
-              {links.map((link) => {
-                const active =
-                  link.href === "/"
-                    ? pathname === "/"
-                    : pathname.startsWith(link.href);
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      "rounded px-3 py-2 text-sm transition-colors duration-200",
-                      active
-                        ? "bg-white/20 font-medium text-white"
-                        : "text-white/85 hover:bg-white/10 hover:text-white",
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <div className="flex items-center gap-2">
-              <ThemeToggle className="border-white/40 bg-black/25 text-white hover:bg-black/40 hover:text-white" />
-              <button
-                type="button"
-                className="text-white md:hidden"
-                onClick={() => setOpen((current) => !current)}
-                aria-label="Menu"
-                aria-expanded={open}
-              >
-                {open ? (
-                  <X className="h-5 w-5" strokeWidth={1.5} />
-                ) : (
-                  <Menu className="h-5 w-5" strokeWidth={1.5} />
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Hero : marque + promesse — hiérarchie explicite */}
-          <div className="mx-auto flex w-full max-w-content flex-1 items-center px-4 pb-8 pt-2 md:px-8 md:pb-12 lg:px-16 lg:pb-16">
+        <div className="absolute inset-0 flex items-center">
+          <div className="mx-auto w-full max-w-content px-4 py-8 md:px-8 md:py-12 lg:px-16 lg:py-16">
             <div className="header-hero-copy max-w-xl motion-safe:animate-fade-up">
               <p className="text-overline font-medium uppercase tracking-overline text-amber-400 drop-shadow-sm">
                 Multi-sim flight log
@@ -114,35 +148,6 @@ export function Nav() {
           </div>
         </div>
       </div>
-
-      {open ? (
-        <nav
-          className="grid gap-1 border-t border-line-subtle bg-bg-elevated px-4 py-3 md:hidden"
-          aria-label="Navigation mobile"
-        >
-          {links.map((link) => {
-            const active =
-              link.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(link.href);
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className={cn(
-                  "rounded px-2 py-2 text-sm",
-                  active
-                    ? "nav-active bg-bg-card"
-                    : "text-ink-secondary hover:bg-bg-hover hover:text-ink-primary",
-                )}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
-      ) : null}
     </header>
   );
 }

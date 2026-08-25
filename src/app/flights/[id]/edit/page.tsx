@@ -20,6 +20,10 @@ type FlightDetail = {
   pilotId: string;
   squadronId: string;
   aircraftId: string;
+  killsAir: number;
+  killsNaval: number;
+  killsGround: number;
+  killsBuilding: number;
   aircraft: { name: string };
 };
 
@@ -42,6 +46,10 @@ export default function EditFlightPage() {
         missionType: flight.missionType,
         outcome: flight.outcome,
         notes: flight.notes,
+        killsAir: flight.killsAir ?? 0,
+        killsNaval: flight.killsNaval ?? 0,
+        killsGround: flight.killsGround ?? 0,
+        killsBuilding: flight.killsBuilding ?? 0,
       });
     });
   }, [params.id]);

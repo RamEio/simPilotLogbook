@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { GAME_VALUES, type Game } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { handleError } from "@/lib/http";
+import { flightTotalPoints } from "@/lib/scoring";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,30 @@ function periodStart(period: string | null): Date | null {
     return new Date(now.getFullYear(), 0, 1);
   }
   return null;
+}
+
+type Agg = {
+  flights: number;
+  minutes: number;
+  successes: number;
+  killsAir: number;
+  killsNaval: number;
+  killsGround: number;
+  killsBuilding: number;
+  points: number;
+};
+
+function emptyAgg(): Agg {
+  return {
+    flights: 0,
+    minutes: 0,
+    successes: 0,
+    killsAir: 0,
+    killsNaval: 0,
+    killsGround: 0,
+    killsBuilding: 0,
+    points: 0,
+  };
 }
 
 export async function GET(request: NextRequest) {
@@ -34,78 +59,115 @@ export async function GET(request: NextRequest) {
       where.game = gameParam;
     }
 
-    const [pilots, squadrons, pilotFlights, squadronFlights] = await Promise.all([
+    const [pilots, squadrons, flights] = await Promise.all([
       prisma.pilot.findMany({
         include: { squadron: true },
         orderBy: { name: "asc" },
       }),
       prisma.squadron.findMany({ orderBy: { name: "asc" } }),
-      prisma.flight.groupBy({
-        by: ["pilotId", "outcome"],
+      prisma.flight.findMany({
         where,
-        _count: { _all: true },
-        _sum: { duration: true },
-      }),
-      prisma.flight.groupBy({
-        by: ["squadronId", "outcome"],
-        where,
-        _count: { _all: true },
-        _sum: { duration: true },
+        select: {
+          pilotId: true,
+          squadronId: true,
+          outcome: true,
+          duration: true,
+          killsAir: true,
+          killsNaval: true,
+          killsGround: true,
+          killsBuilding: true,
+        },
       }),
     ]);
 
+    const byPilot = new Map<string, Agg>();
+    const bySquadron = new Map<string, Agg>();
+
+    for (const flight of flights) {
+      const kills = {
+        killsAir: flight.killsAir,
+        killsNaval: flight.killsNaval,
+        killsGround: flight.killsGround,
+        killsBuilding: flight.killsBuilding,
+      };
+      const points = flightTotalPoints(kills, flight.duration);
+
+      const pilotAgg = byPilot.get(flight.pilotId) ?? emptyAgg();
+      pilotAgg.flights += 1;
+      pilotAgg.minutes += flight.duration;
+      if (flight.outcome === "SUCCESS") pilotAgg.successes += 1;
+      pilotAgg.killsAir += flight.killsAir;
+      pilotAgg.killsNaval += flight.killsNaval;
+      pilotAgg.killsGround += flight.killsGround;
+      pilotAgg.killsBuilding += flight.killsBuilding;
+      pilotAgg.points += points;
+      byPilot.set(flight.pilotId, pilotAgg);
+
+      const sqAgg = bySquadron.get(flight.squadronId) ?? emptyAgg();
+      sqAgg.flights += 1;
+      sqAgg.minutes += flight.duration;
+      if (flight.outcome === "SUCCESS") sqAgg.successes += 1;
+      sqAgg.killsAir += flight.killsAir;
+      sqAgg.killsNaval += flight.killsNaval;
+      sqAgg.killsGround += flight.killsGround;
+      sqAgg.killsBuilding += flight.killsBuilding;
+      sqAgg.points += points;
+      bySquadron.set(flight.squadronId, sqAgg);
+    }
+
     const pilotRanks = pilots
       .map((pilot) => {
-        const rows = pilotFlights.filter((row) => row.pilotId === pilot.id);
-        const flights = rows.reduce((sum, row) => sum + row._count._all, 0);
-        const minutes = rows.reduce(
-          (sum, row) => sum + (row._sum.duration ?? 0),
-          0,
-        );
-        const successes =
-          rows.find((row) => row.outcome === "SUCCESS")?._count._all ?? 0;
+        const agg = byPilot.get(pilot.id) ?? emptyAgg();
         return {
           id: pilot.id,
           name: pilot.name,
           callsign: pilot.callsign,
           squadronName: pilot.squadron.tag ?? pilot.squadron.name,
-          flights,
-          minutes,
+          flights: agg.flights,
+          minutes: agg.minutes,
           successRate:
-            flights === 0 ? 0 : Math.round((successes / flights) * 100),
+            agg.flights === 0
+              ? 0
+              : Math.round((agg.successes / agg.flights) * 100),
+          killsAir: agg.killsAir,
+          killsNaval: agg.killsNaval,
+          killsGround: agg.killsGround,
+          killsBuilding: agg.killsBuilding,
+          points: Math.round(agg.points * 10) / 10,
         };
       })
-      .filter((pilot) => pilot.flights > 0)
-      .sort((a, b) => b.minutes - a.minutes || b.flights - a.flights);
+      .filter((pilot) => pilot.flights > 0);
 
     const squadronRanks = squadrons
       .map((squadron) => {
-        const rows = squadronFlights.filter(
-          (row) => row.squadronId === squadron.id,
-        );
-        const flights = rows.reduce((sum, row) => sum + row._count._all, 0);
-        const minutes = rows.reduce(
-          (sum, row) => sum + (row._sum.duration ?? 0),
-          0,
-        );
-        const successes =
-          rows.find((row) => row.outcome === "SUCCESS")?._count._all ?? 0;
+        const agg = bySquadron.get(squadron.id) ?? emptyAgg();
         return {
           id: squadron.id,
           name: squadron.name,
           tag: squadron.tag,
-          flights,
-          minutes,
+          flights: agg.flights,
+          minutes: agg.minutes,
           successRate:
-            flights === 0 ? 0 : Math.round((successes / flights) * 100),
+            agg.flights === 0
+              ? 0
+              : Math.round((agg.successes / agg.flights) * 100),
+          killsAir: agg.killsAir,
+          killsNaval: agg.killsNaval,
+          killsGround: agg.killsGround,
+          killsBuilding: agg.killsBuilding,
+          points: Math.round(agg.points * 10) / 10,
         };
       })
-      .filter((squadron) => squadron.flights > 0)
-      .sort((a, b) => b.minutes - a.minutes || b.flights - a.flights);
+      .filter((squadron) => squadron.flights > 0);
 
     return NextResponse.json({
       period,
-      game: gameParam && GAME_VALUES.includes(gameParam as Game) ? gameParam : "all",
+      game:
+        gameParam && GAME_VALUES.includes(gameParam as Game)
+          ? gameParam
+          : "all",
+      rules:
+        "Aérien 5 · Naval 4 · Sol 3 · Building 2 · 1 h de vol 1",
       pilots: pilotRanks,
       squadrons: squadronRanks,
     });

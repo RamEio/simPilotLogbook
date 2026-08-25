@@ -12,6 +12,10 @@ export const FLIGHT_CSV_HEADERS = [
   "mission_name",
   "outcome",
   "notes",
+  "kills_air",
+  "kills_naval",
+  "kills_ground",
+  "kills_building",
 ] as const;
 
 export type FlightCsvRow = Record<(typeof FLIGHT_CSV_HEADERS)[number], string>;

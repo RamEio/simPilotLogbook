@@ -40,20 +40,24 @@ model Aircraft {
 }
 
 model Flight {
-  id          String   @id @default(cuid())
-  date        DateTime @default(now())
-  pilotId     String
-  pilot       Pilot    @relation(fields: [pilotId], references: [id])
-  squadronId  String
-  squadron    Squadron @relation(fields: [squadronId], references: [id])
-  aircraftId  String
-  aircraft    Aircraft @relation(fields: [aircraftId], references: [id])
-  game        String
-  duration    Int
-  missionType String?
-  missionName String?
-  outcome     String
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  date          DateTime @default(now())
+  pilotId       String
+  pilot         Pilot    @relation(fields: [pilotId], references: [id])
+  squadronId    String
+  squadron      Squadron @relation(fields: [squadronId], references: [id])
+  aircraftId    String
+  aircraft      Aircraft @relation(fields: [aircraftId], references: [id])
+  game          String
+  duration      Int
+  missionType   String?
+  missionName   String?
+  outcome       String
+  notes         String?
+  killsAir      Int      @default(0)
+  killsNaval    Int      @default(0)
+  killsGround   Int      @default(0)
+  killsBuilding Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

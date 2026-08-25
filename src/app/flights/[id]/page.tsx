@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { apiFetch } from "@/lib/api";
 import { gameLabel } from "@/lib/constants";
+import { flightTotalPoints, KILL_CATEGORIES } from "@/lib/scoring";
 import { formatDate, formatDuration } from "@/lib/utils";
 import type { Game, Outcome } from "@/lib/constants";
 
@@ -29,6 +30,10 @@ type FlightDetail = {
   notes: string | null;
   outcome: Outcome;
   game: Game;
+  killsAir: number;
+  killsNaval: number;
+  killsGround: number;
+  killsBuilding: number;
   aircraft: { name: string };
   pilot: { name: string; callsign: string | null };
   squadron: { id: string; name: string; tag: string | null };
@@ -53,6 +58,15 @@ export default function FlightDetailPage() {
   if (!flight) {
     return <p className="text-sm text-ink-secondary">Chargement...</p>;
   }
+
+  const kills = {
+    killsAir: flight.killsAir ?? 0,
+    killsNaval: flight.killsNaval ?? 0,
+    killsGround: flight.killsGround ?? 0,
+    killsBuilding: flight.killsBuilding ?? 0,
+  };
+  const points = flightTotalPoints(kills, flight.duration);
+  const hasKills = KILL_CATEGORIES.some((cat) => kills[cat.key] > 0);
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 fade-in">
@@ -81,6 +95,15 @@ export default function FlightDetailPage() {
           <p>Durée : {formatDuration(flight.duration)}</p>
           {flight.missionType ? <p>Type : {flight.missionType}</p> : null}
           {flight.missionName ? <p>Mission : {flight.missionName}</p> : null}
+          {hasKills ? (
+            <p>
+              Kills :{" "}
+              {KILL_CATEGORIES.filter((cat) => kills[cat.key] > 0)
+                .map((cat) => `${cat.label} ${kills[cat.key]}`)
+                .join(" · ")}
+            </p>
+          ) : null}
+          <p>Points : {Math.round(points * 10) / 10}</p>
           {flight.notes ? <p>Notes : {flight.notes}</p> : null}
         </CardContent>
       </Card>

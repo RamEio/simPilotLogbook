@@ -8,6 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CollapsibleCard } from "@/components/collapsible-card";
 import { pilotStatusMeta } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import {
+  flightTotalPoints,
+  KILL_CATEGORIES,
+  POINTS_RULES_LABEL,
+} from "@/lib/scoring";
 import { formatHours } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +43,7 @@ export default async function PilotDetailPage({
     notFound();
   }
 
-  const [aggregates, successes] = await Promise.all([
+  const [aggregates, successes, killAgg] = await Promise.all([
     prisma.flight.aggregate({
       where: { pilotId: params.id },
       _count: { _all: true },
@@ -47,12 +52,30 @@ export default async function PilotDetailPage({
     prisma.flight.count({
       where: { pilotId: params.id, outcome: "SUCCESS" },
     }),
+    prisma.flight.aggregate({
+      where: { pilotId: params.id },
+      _sum: {
+        killsAir: true,
+        killsNaval: true,
+        killsGround: true,
+        killsBuilding: true,
+        duration: true,
+      },
+    }),
   ]);
 
   const totalFlights = aggregates._count._all;
   const successRate =
     totalFlights === 0 ? 0 : Math.round((successes / totalFlights) * 100);
   const statusMeta = pilotStatusMeta(pilot.status);
+
+  const kills = {
+    killsAir: killAgg._sum.killsAir ?? 0,
+    killsNaval: killAgg._sum.killsNaval ?? 0,
+    killsGround: killAgg._sum.killsGround ?? 0,
+    killsBuilding: killAgg._sum.killsBuilding ?? 0,
+  };
+  const totalPoints = flightTotalPoints(kills, killAgg._sum.duration ?? 0);
 
   return (
     <div className="space-y-6 fade-in">
@@ -105,6 +128,32 @@ export default async function PilotDetailPage({
           </CardHeader>
           <CardContent className="text-h2 text-ink-primary">{successRate}%</CardContent>
         </Card>
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-caption text-ink-muted">
+          Compteurs kills (cumul des vols) · {POINTS_RULES_LABEL}
+        </p>
+        <div className="grid gap-3 grid-cols-2 sm:grid-cols-5">
+          {KILL_CATEGORIES.map((cat) => (
+            <Card key={cat.key}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">{cat.label}</CardTitle>
+              </CardHeader>
+              <CardContent className="text-h2 text-ink-primary">
+                {kills[cat.key]}
+              </CardContent>
+            </Card>
+          ))}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Points</CardTitle>
+            </CardHeader>
+            <CardContent className="text-h2 text-ink-primary">
+              {Math.round(totalPoints * 10) / 10}
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <CollapsibleCard title="Modifier le statut" defaultOpen>
