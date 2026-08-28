@@ -61,14 +61,16 @@ export default function NewPilotPage() {
           { label: "Nouveau" },
         ]}
       />
-      <p className="overline overline-amber">Ops / Pilots</p>
+      <p className="overline overline-amber">Opérations / Pilotes</p>
       <h1 className="mt-1 text-h1 text-ink-primary">Nouveau pilote</h1>
       <div className="space-y-2">
-        <Label htmlFor="name">Nom</Label>
+        <Label htmlFor="name" required>
+          Nom
+        </Label>
         <Input id="name" value={name} onChange={(event) => setName(event.target.value)} required />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="callsign">Callsign</Label>
+        <Label htmlFor="callsign">Indicatif</Label>
         <Input
           id="callsign"
           value={callsign}
@@ -76,7 +78,7 @@ export default function NewPilotPage() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="pin">PIN optionnel</Label>
+        <Label htmlFor="pin">PIN (optionnel)</Label>
         <Input
           id="pin"
           inputMode="numeric"
@@ -87,9 +89,13 @@ export default function NewPilotPage() {
             setPin(event.target.value.replace(/\D/g, "").slice(0, 4))
           }
         />
+        <p className="text-caption text-ink-muted">
+          Ce code PIN protège les changements de statut. Laissez vide si
+          inutile.
+        </p>
       </div>
       <div className="space-y-2">
-        <Label>Escadrille</Label>
+        <Label required>Escadrille</Label>
         <Select value={squadronId || undefined} onValueChange={setSquadronId}>
           <SelectTrigger>
             <SelectValue placeholder="Choisir une escadrille" />
@@ -103,9 +109,22 @@ export default function NewPilotPage() {
           </SelectContent>
         </Select>
       </div>
-      <Button type="submit" className="w-full" disabled={!squadronId}>
-        Créer
-      </Button>
+      <div className="space-y-2">
+        <Button type="submit" className="w-full" disabled={!squadronId}>
+          Créer
+        </Button>
+        {!squadronId ? (
+          <p className="text-caption text-ink-muted">
+            Sélectionnez une escadrille pour créer un pilote.
+          </p>
+        ) : null}
+        <p className="text-caption text-ink-muted">
+          <span className="text-status-error" aria-hidden>
+            *
+          </span>{" "}
+          Champ obligatoire
+        </p>
+      </div>
     </form>
   );
 }

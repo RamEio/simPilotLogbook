@@ -15,7 +15,7 @@ import {
 import { apiFetch } from "@/lib/api";
 import { GAMES, type Game } from "@/lib/constants";
 import { POINTS_RULES_LABEL } from "@/lib/scoring";
-import { formatHours } from "@/lib/utils";
+import { formatCount, formatHours } from "@/lib/utils";
 
 type PilotRank = {
   id: string;
@@ -114,13 +114,13 @@ function formatMetric(
   if (board === "hours") {
     return {
       primary: formatHours(row.minutes),
-      secondary: `${row.flights} vols · ${row.successRate}%`,
+      secondary: `${formatCount(row.flights, "vol")} · ${row.successRate}%`,
     };
   }
   if (board === "points") {
     return {
       primary: `${row.points} pts`,
-      secondary: `${row.flights} vols · ${formatHours(row.minutes)}`,
+      secondary: `${formatCount(row.flights, "vol")} · ${formatHours(row.minutes)}`,
     };
   }
   const value = metric(row, board);
@@ -172,7 +172,7 @@ export default function LeaderboardPage() {
       <Breadcrumbs items={[{ label: "Classements" }]} />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="overline overline-amber">Ops / Leaderboard</p>
+          <p className="overline overline-amber">Opérations / Classements</p>
           <h1 className="mt-1 text-h1 text-ink-primary">Classements</h1>
           <p className="mt-1 max-w-xl text-sm text-ink-secondary">
             Heures, kills et points — pilotes et escadrilles.
@@ -202,7 +202,7 @@ export default function LeaderboardPage() {
               <SelectValue placeholder="Période" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All-time</SelectItem>
+              <SelectItem value="all">Toutes périodes</SelectItem>
               <SelectItem value="30d">30 derniers jours</SelectItem>
               <SelectItem value="year">Cette année</SelectItem>
             </SelectContent>

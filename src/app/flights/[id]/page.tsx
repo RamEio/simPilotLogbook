@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { OutcomeBadge } from "@/components/outcome-badge";
@@ -76,7 +77,14 @@ export default function FlightDetailPage() {
           { label: flight.aircraft.name },
         ]}
       />
-      <p className="overline overline-amber">Ops / Flight</p>
+      <Link
+        href="/flights"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-secondary transition-colors hover:text-ink-primary"
+      >
+        <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+        Retour à l&apos;historique
+      </Link>
+      <p className="overline overline-amber">Opérations / Vol</p>
       <h1 className="sr-only">Détail du vol</h1>
       <Card>
         <CardHeader className="flex flex-row items-start justify-between gap-3">
@@ -114,8 +122,13 @@ export default function FlightDetailPage() {
         <Button asChild variant="secondary">
           <Link href="/log">Nouveau vol</Link>
         </Button>
-        <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
-          Supprimer
+        <Button
+          variant="destructive"
+          className="ml-auto gap-2"
+          onClick={() => setConfirmOpen(true)}
+        >
+          <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+          Supprimer ce vol
         </Button>
       </div>
 
@@ -125,14 +138,20 @@ export default function FlightDetailPage() {
             <DialogTitle>Supprimer ce vol ?</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-ink-secondary">
-            Cette action est définitive.
+            Cette action est irréversible. Le vol sera définitivement effacé du
+            carnet.
           </p>
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setConfirmOpen(false)}>
               Annuler
             </Button>
-            <Button variant="destructive" onClick={() => void remove()}>
-              Confirmer
+            <Button
+              variant="destructive"
+              className="gap-2"
+              onClick={() => void remove()}
+            >
+              <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+              Confirmer la suppression
             </Button>
           </div>
         </DialogContent>

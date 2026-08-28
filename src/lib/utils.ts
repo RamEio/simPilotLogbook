@@ -22,6 +22,15 @@ export function formatHours(totalMinutes: number): string {
   return `${hours.toFixed(1)} h`;
 }
 
+/** French pluralization: formatCount(1, "vol") → "1 vol" ; formatCount(2, "vol") → "2 vols" */
+export function formatCount(
+  count: number,
+  singular: string,
+  plural = `${singular}s`,
+): string {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
 export function formatDate(value: Date | string): string {
   const date = typeof value === "string" ? new Date(value) : value;
   return new Intl.DateTimeFormat("fr-FR", {

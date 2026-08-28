@@ -87,7 +87,7 @@ export default async function PilotDetailPage({
       />
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="overline overline-amber">Ops / Pilot</p>
+          <p className="overline overline-amber">Opérations / Pilote</p>
           <h1 className="mt-1 text-h1 text-ink-primary">
             {pilot.callsign ?? pilot.name}
           </h1>

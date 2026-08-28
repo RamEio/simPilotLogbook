@@ -113,7 +113,7 @@ export function PilotEditForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="pilot-callsign">Callsign</Label>
+          <Label htmlFor="pilot-callsign">Indicatif</Label>
           <Input
             id="pilot-callsign"
             value={callsign}
@@ -123,7 +123,7 @@ export function PilotEditForm({
       </div>
 
       <div className="space-y-2">
-        <Label>Escadrille</Label>
+        <Label required>Escadrille</Label>
         <Select value={squadronId} onValueChange={setSquadronId}>
           <SelectTrigger>
             <SelectValue placeholder="Escadrille" />
@@ -154,6 +154,10 @@ export function PilotEditForm({
             setPin(event.target.value.replace(/\D/g, "").slice(0, 4))
           }
         />
+        <p className="text-caption text-ink-muted">
+          Ce code PIN protège les changements de statut. Laissez vide si
+          inutile.
+        </p>
         {pilot.hasPin ? (
           <label className="flex items-center gap-2 text-sm text-ink-secondary">
             <input

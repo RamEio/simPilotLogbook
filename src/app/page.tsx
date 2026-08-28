@@ -5,7 +5,7 @@ import { FlightCard } from "@/components/flight-card";
 import { Button } from "@/components/ui/button";
 import { GAMES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import { formatHours } from "@/lib/utils";
+import { formatCount, formatHours } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
       <Breadcrumbs items={[{ label: "Tableau de bord" }]} />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="overline overline-amber">Ops / Dashboard</p>
+          <p className="overline overline-amber">Opérations / Tableau de bord</p>
           <h1 className="mt-1 text-h1 text-ink-primary">Sim Pilot Logbook</h1>
         </div>
         <Button asChild size="lg">
@@ -127,8 +127,8 @@ export default async function DashboardPage() {
                     {aircraft.name}
                   </span>
                   <span className="shrink-0 text-caption text-ink-muted">
-                    {formatHours(aircraft.minutes)} · {aircraft.flights} vol
-                    {aircraft.flights > 1 ? "s" : ""}
+                    {formatHours(aircraft.minutes)} ·{" "}
+                    {formatCount(aircraft.flights, "vol")}
                   </span>
                 </div>
                 <div className="progress-track">
@@ -149,7 +149,7 @@ export default async function DashboardPage() {
         {recentFlights.length === 0 ? (
           <p className="text-sm text-ink-secondary">
             Aucun vol enregistré. Commence par créer une escadrille et un
-            pilote, puis loggue ta première sortie.
+            pilote, puis enregistre ta première sortie.
           </p>
         ) : (
           <div className="grid gap-3">

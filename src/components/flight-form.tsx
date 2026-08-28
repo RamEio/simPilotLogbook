@@ -340,7 +340,9 @@ export function FlightForm({
       />
       <div>
         <p className="overline overline-amber">
-          {mode === "edit" ? "Ops / Edit Flight" : "Ops / Log"}
+          {mode === "edit"
+            ? "Opérations / Modifier le vol"
+            : "Opérations / Journal de vol"}
         </p>
         <h1 className="mt-1 text-h1 text-ink-primary">
           {mode === "edit" ? "Modifier un vol" : "Enregistrer un vol"}
@@ -349,7 +351,7 @@ export function FlightForm({
 
       <form className="space-y-6" onSubmit={(event) => void onSubmit(event)}>
         <div className="space-y-2">
-          <Label>Escadrille</Label>
+          <Label required>Escadrille</Label>
           <Select value={squadronId || undefined} onValueChange={setSquadronId}>
             <SelectTrigger>
               <SelectValue placeholder="Sélectionner une escadrille" />
@@ -376,7 +378,7 @@ export function FlightForm({
         </div>
 
         <div className="space-y-2">
-          <Label>Pilote</Label>
+          <Label required>Pilote</Label>
           <Select
             value={pilotId || undefined}
             onValueChange={requestPilotChange}
@@ -407,12 +409,12 @@ export function FlightForm({
         </div>
 
         <div className="space-y-2">
-          <Label>Simulateur</Label>
+          <Label required>Simulateur</Label>
           <GameSelector value={game} onChange={setGame} />
         </div>
 
         <div className="space-y-2">
-          <Label>Avion</Label>
+          <Label required>Avion</Label>
           <AircraftCombobox
             key={`${game || "none"}-${aircraftId || "empty"}`}
             aircraft={aircraft}
@@ -470,7 +472,7 @@ export function FlightForm({
         </div>
 
         <div className="space-y-2">
-          <Label>Résultat</Label>
+          <Label required>Résultat</Label>
           <OutcomeSelector value={outcome} onChange={setOutcome} />
         </div>
 
@@ -525,6 +527,13 @@ export function FlightForm({
             placeholder="Optionnel"
           />
         </div>
+
+        <p className="text-caption text-ink-muted">
+          <span className="text-status-error" aria-hidden>
+            *
+          </span>{" "}
+          Champ obligatoire
+        </p>
 
         <Button type="submit" size="lg" className="w-full" disabled={submitting}>
           {submitting
@@ -590,7 +599,7 @@ export function FlightForm({
               onChange={(event) => setNewPilotName(event.target.value)}
             />
             <Input
-              placeholder="Callsign optionnel"
+              placeholder="Indicatif optionnel"
               value={newPilotCallsign}
               onChange={(event) => setNewPilotCallsign(event.target.value)}
             />

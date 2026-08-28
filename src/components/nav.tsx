@@ -27,18 +27,10 @@ export function Nav() {
 
   return (
     <header className="relative z-20 w-full">
-      {/* Chrome sticky — décorrélé de l’image hero */}
       <div className="sticky top-0 z-30 border-b border-line-subtle bg-bg-elevated/95 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-content items-center justify-between gap-3 px-4 py-3 md:px-8 md:py-3.5 lg:px-16">
-          <Link
-            href="/"
-            className="shrink-0 text-overline font-medium uppercase tracking-overline text-ink-muted transition-colors hover:text-ink-primary"
-          >
-            Accueil
-          </Link>
-
           <nav
-            className="hidden items-center gap-1 md:flex"
+            className="hidden min-w-0 flex-1 items-center gap-1 md:flex"
             aria-label="Navigation principale"
           >
             {links.map((link) => {
@@ -63,7 +55,7 @@ export function Nav() {
             })}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
             <button
               type="button"
@@ -111,7 +103,6 @@ export function Nav() {
         ) : null}
       </div>
 
-      {/* Hero image — scroll normal, branding only */}
       <div className="relative w-full border-b border-line-subtle">
         <Image
           key={headerSrc}
@@ -130,7 +121,7 @@ export function Nav() {
           <div className="mx-auto w-full max-w-content px-4 py-8 md:px-8 md:py-12 lg:px-16 lg:py-16">
             <div className="header-hero-copy max-w-xl motion-safe:animate-fade-up">
               <p className="text-overline font-medium uppercase tracking-overline text-amber-400 drop-shadow-sm">
-                Multi-sim flight log
+                Carnet multi-simulateurs
               </p>
               <h1 className="mt-2 text-3xl font-bold tracking-tight text-white drop-shadow-md sm:text-4xl md:text-5xl lg:text-[3.25rem] lg:leading-tight">
                 <Link
@@ -140,10 +131,16 @@ export function Nav() {
                   Sim Pilot Logbook
                 </Link>
               </h1>
-              <p className="mt-3 max-w-md text-base leading-relaxed text-white/90 drop-shadow-sm sm:text-lg">
-                Enregistrez toutes vos sessions de vol — IL-2, DCS, Star Citizen,
-                MSFS et plus encore.
+              <p className="mt-3 max-w-md text-base leading-relaxed text-white/95 drop-shadow-sm sm:text-lg">
+                Le carnet de vol partagé pour escadrilles virtuelles — IL-2,
+                DCS, Star Citizen, MSFS et plus.
               </p>
+              <Link
+                href="/log"
+                className="mt-5 inline-flex min-h-11 items-center justify-center rounded bg-crimson-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-crimson-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+              >
+                Enregistrer un vol
+              </Link>
             </div>
           </div>
         </div>

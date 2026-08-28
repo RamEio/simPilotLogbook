@@ -53,7 +53,7 @@ export default async function SquadronDetailPage({
         ]}
       />
       <div>
-        <p className="overline overline-amber">Ops / Squadron</p>
+        <p className="overline overline-amber">Opérations / Escadrille</p>
         <h1 className="mt-1 text-h1 text-ink-primary">
           {squadron.tag ? `${squadron.tag} ` : ""}
           {squadron.name}

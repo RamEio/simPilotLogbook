@@ -36,7 +36,7 @@ export default function NewSquadronPage() {
           { label: "Nouvelle" },
         ]}
       />
-      <p className="overline overline-amber">Ops / Squadrons</p>
+      <p className="overline overline-amber">Opérations / Escadrilles</p>
       <h1 className="mt-1 text-h1 text-ink-primary">Nouvelle escadrille</h1>
       <div className="space-y-2">
         <Label htmlFor="name">Nom</Label>

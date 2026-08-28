@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SquadronIcon } from "@/components/icons/squadron-icons";
 import { prisma } from "@/lib/prisma";
+import { formatCount } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,7 @@ export default async function SquadronsPage() {
       <Breadcrumbs items={[{ label: "Escadrilles" }]} />
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="overline overline-amber">Ops / Squadrons</p>
+          <p className="overline overline-amber">Opérations / Escadrilles</p>
           <h1 className="mt-1 text-h1 text-ink-primary">Escadrilles</h1>
         </div>
         <Button asChild>
@@ -42,7 +43,8 @@ export default async function SquadronsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-caption text-ink-muted">
-                  {squadron._count.pilots} pilotes · {squadron._count.flights} vols
+                  {formatCount(squadron._count.pilots, "pilote")} ·{" "}
+                  {formatCount(squadron._count.flights, "vol")}
                 </CardContent>
               </Card>
             </Link>

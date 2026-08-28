@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import {
   FlightForm,
   type FlightFormInitial,
@@ -59,14 +61,23 @@ export default function EditFlightPage() {
   }
 
   return (
-    <FlightForm
-      mode="edit"
-      initial={initial}
-      breadcrumbs={[
-        { label: "Vols", href: "/flights" },
-        { label: aircraftName, href: `/flights/${initial.id}` },
-        { label: "Modifier" },
-      ]}
-    />
+    <div className="space-y-3">
+      <Link
+        href={`/flights/${initial.id}`}
+        className="inline-flex items-center gap-1.5 text-sm text-ink-secondary transition-colors hover:text-ink-primary"
+      >
+        <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+        Retour au détail du vol
+      </Link>
+      <FlightForm
+        mode="edit"
+        initial={initial}
+        breadcrumbs={[
+          { label: "Vols", href: "/flights" },
+          { label: aircraftName, href: `/flights/${initial.id}` },
+          { label: "Modifier" },
+        ]}
+      />
+    </div>
   );
 }

@@ -101,7 +101,7 @@ export default function FlightsPage() {
       <Breadcrumbs items={[{ label: "Vols" }]} />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="overline overline-amber">Ops / Flights</p>
+          <p className="overline overline-amber">Opérations / Vols</p>
           <h1 className="mt-1 text-h1 text-ink-primary">Vols</h1>
           <p className="mt-1 max-w-xl text-sm text-ink-secondary">
             Exporte le carnet en CSV (à garder hors du serveur). Après un rebuild

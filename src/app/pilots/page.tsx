@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { pilotStatusMeta } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import { formatCount } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,7 @@ export default async function PilotsPage() {
       <Breadcrumbs items={[{ label: "Pilotes" }]} />
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="overline overline-amber">Ops / Pilots</p>
+          <p className="overline overline-amber">Opérations / Pilotes</p>
           <h1 className="mt-1 text-h1 text-ink-primary">Pilotes</h1>
         </div>
         <Button asChild>
@@ -49,7 +50,7 @@ export default async function PilotsPage() {
                 </CardHeader>
                 <CardContent className="text-sm text-ink-secondary">
                   {pilot.squadron.tag ?? pilot.squadron.name} ·{" "}
-                  {pilot._count.flights} vols
+                  {formatCount(pilot._count.flights, "vol")}
                 </CardContent>
               </Card>
             </Link>
