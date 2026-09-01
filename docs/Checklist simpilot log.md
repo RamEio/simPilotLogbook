@@ -124,6 +124,7 @@ Voilà l'analyse IA de ton associé Design !
 | 01/09/2026 | **D-AUTH C′ + D-SOLO tranchés** : vision comptes niveau escadrille ; court terme PIN ; Solo = escadrille système hors classements (doc only, pas d’impl.) |
 | 01/09/2026 | **P-MERGE ajouté LATER** : fusion de deux pilotes (doublons) uniquement si connecté (après H1-impl) |
 | 01/09/2026 | **SOON G3/G6/post-save** : drop CSV, PilotRow, bannière « Modifications enregistrées » |
+| 01/09/2026 | **P-SORT** : filtre statut + tri roster pilotes (nom / createdAt / statut) |
 
 ---
 
@@ -379,6 +380,7 @@ Filtres leaderboard (G1/G5), erreurs inline (C2), onboarding 3 étapes (A1), gra
 - [x] **G6** Composant `PilotCard` / `PilotRow` unique — *01/09/2026*
 - [x] **F1** Audit mobile 390px + correctifs tap targets — *31/08/2026*
 - [x] Confirmation visuelle post-save édition vol — *01/09/2026*
+- [x] **P-SORT** Liste pilotes : filtre statut + tri (nom / date création / statut) — *01/09/2026*
 
 ### LATER — Étendre sans diluer (3–9 mois)
 
