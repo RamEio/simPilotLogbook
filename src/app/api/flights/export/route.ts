@@ -29,6 +29,7 @@ export async function GET() {
         flight.squadron.tag,
         flight.pilot.name,
         flight.pilot.callsign,
+        flight.pilot.status,
         flight.missionType,
         flight.missionName,
         flight.outcome,

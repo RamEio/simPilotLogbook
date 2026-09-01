@@ -18,12 +18,17 @@ const links = [
   { href: "/leaderboard", label: "Classements" },
 ];
 
+/** Native asset size — avoid upscaling past source on ultra-wide */
+const HEADER_NATIVE_W = 1672;
+const HEADER_NATIVE_H = 941;
+
 export function Nav() {
   const pathname = usePathname();
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   const headerSrc =
     theme === "light" ? "/header-light.png" : "/header-dark.png";
+  const isHome = pathname === "/";
 
   return (
     <header className="relative z-20 w-full">
@@ -59,7 +64,7 @@ export function Nav() {
             <ThemeToggle />
             <button
               type="button"
-              className="text-ink-primary md:hidden"
+              className="inline-flex h-11 w-11 items-center justify-center rounded text-ink-primary md:hidden"
               onClick={() => setOpen((current) => !current)}
               aria-label="Menu"
               aria-expanded={open}
@@ -89,7 +94,7 @@ export function Nav() {
                   href={link.href}
                   onClick={() => setOpen(false)}
                   className={cn(
-                    "rounded px-2 py-2 text-sm",
+                    "flex min-h-11 items-center rounded px-3 py-3 text-sm",
                     active
                       ? "nav-active bg-bg-card"
                       : "text-ink-secondary hover:bg-bg-hover hover:text-ink-primary",
@@ -103,27 +108,45 @@ export function Nav() {
         ) : null}
       </div>
 
-      <div className="relative w-full border-b border-line-subtle">
+      {/* Image plein cadre, object-cover (zoom) */}
+      <div
+        className={cn(
+          "relative w-full overflow-hidden border-b border-line-subtle bg-bg-deep",
+          isHome ? "min-h-[300px] h-[50vh] max-h-[50vh]" : "h-24 md:h-[6.5rem]",
+        )}
+      >
         <Image
           key={headerSrc}
           src={headerSrc}
           alt=""
-          width={1672}
-          height={941}
+          width={HEADER_NATIVE_W}
+          height={HEADER_NATIVE_H}
           priority
-          className="block h-auto w-full"
+          className="absolute inset-0 h-full w-full object-cover object-center"
           sizes="100vw"
         />
 
-        <div className="header-scrim absolute inset-0" aria-hidden />
+        <div className="header-scrim absolute inset-0 z-[1]" aria-hidden />
 
-        <div className="absolute inset-0 flex items-center">
-          <div className="mx-auto w-full max-w-content px-4 py-8 md:px-8 md:py-12 lg:px-16 lg:py-16">
+        <div className="absolute inset-0 z-[2] flex items-center">
+          <div
+            className={cn(
+              "mx-auto w-full max-w-content px-4 md:px-8 lg:px-16",
+              isHome ? "py-8 md:py-12 lg:py-14" : "py-2.5 md:py-3",
+            )}
+          >
             <div className="header-hero-copy max-w-xl motion-safe:animate-fade-up">
               <p className="text-overline font-medium uppercase tracking-overline text-amber-400 drop-shadow-sm">
                 Carnet multi-simulateurs
               </p>
-              <h1 className="mt-2 text-3xl font-bold tracking-tight text-white drop-shadow-md sm:text-4xl md:text-5xl lg:text-[3.25rem] lg:leading-tight">
+              <h1
+                className={cn(
+                  "mt-1 font-bold tracking-tight text-white drop-shadow-md",
+                  isHome
+                    ? "text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] lg:leading-tight"
+                    : "text-lg sm:text-xl md:text-2xl",
+                )}
+              >
                 <Link
                   href="/"
                   className="rounded outline-none transition-opacity hover:opacity-95 focus-visible:ring-2 focus-visible:ring-white/80"
@@ -131,16 +154,20 @@ export function Nav() {
                   Sim Pilot Logbook
                 </Link>
               </h1>
-              <p className="mt-3 max-w-md text-base leading-relaxed text-white/95 drop-shadow-sm sm:text-lg">
-                Le carnet de vol partagé pour escadrilles virtuelles — IL-2,
-                DCS, Star Citizen, MSFS et plus.
-              </p>
-              <Link
-                href="/log"
-                className="mt-5 inline-flex min-h-11 items-center justify-center rounded bg-crimson-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-crimson-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-              >
-                Enregistrer un vol
-              </Link>
+              {isHome ? (
+                <>
+                  <p className="mt-3 max-w-md text-base leading-relaxed text-white/95 drop-shadow-sm sm:text-lg">
+                    Le carnet de vol partagé pour escadrilles virtuelles — IL-2,
+                    DCS, Star Citizen, MSFS et plus.
+                  </p>
+                  <Link
+                    href="/log"
+                    className="mt-5 inline-flex min-h-11 items-center justify-center rounded bg-crimson-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-crimson-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                  >
+                    Enregistrer un vol
+                  </Link>
+                </>
+              ) : null}
             </div>
           </div>
         </div>

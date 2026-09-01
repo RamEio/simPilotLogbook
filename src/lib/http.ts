@@ -20,7 +20,7 @@ export function handleError(error: unknown) {
 
 export const flightInclude = {
   aircraft: { select: { id: true, name: true, isCustom: true } },
-  pilot: { select: { id: true, name: true, callsign: true } },
+  pilot: { select: { id: true, name: true, callsign: true, status: true } },
   squadron: { select: { id: true, name: true, tag: true } },
 } as const;
 
@@ -28,6 +28,7 @@ type PilotWithRelations = {
   id: string;
   name: string;
   callsign: string | null;
+  status?: string;
   pin?: string | null;
   squadronId: string;
   createdAt?: Date;

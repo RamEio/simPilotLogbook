@@ -15,11 +15,13 @@ export function AircraftCombobox({
   value,
   onChange,
   disabled,
+  invalid,
 }: {
   aircraft: AircraftOption[];
   value: string;
   onChange: (id: string) => void;
   disabled?: boolean;
+  invalid?: boolean;
 }) {
   const selected = aircraft.find((item) => item.id === value);
   const [query, setQuery] = useState(selected?.name ?? "");
@@ -40,6 +42,8 @@ export function AircraftCombobox({
       <Input
         value={query}
         disabled={disabled}
+        aria-invalid={Boolean(invalid)}
+        className={invalid ? "border-status-error focus-visible:border-status-error" : undefined}
         placeholder={disabled ? "Choisir un simulateur d'abord" : "Rechercher un appareil"}
         onFocus={() => setOpen(true)}
         onChange={(event) => {

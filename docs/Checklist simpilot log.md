@@ -2,7 +2,7 @@
 
 > Suivi des travaux réalisés — Design System Korea v3.0 & évolutions produit  
 > Sources actives : `docs/simpilot_audit.pdf` (p.31–36) · `ASSETS/Designer.md` · parking produit  
-> Dernière mise à jour : **28 août 2026**
+> Dernière mise à jour : **31 août 2026**
 
 ---
 
@@ -81,7 +81,7 @@ La checklist est **cohérente** avec le rôle Designer (priorisation, tableaux, 
 | Recommandations actionnables | ✅ NOW détaillé ; SOON/LATER phasés |
 | Tableaux synthétiques | ✅ confrontation, mapping, effort |
 | Priorisation impact / effort | ✅ NOW quick wins → SOON features → LATER vision (= feuille de route audit) |
-| Signaler l’incertain | ✅ D-AUTH, D-SOLO, D-HERO ouverts |
+| Signaler l’incertain | ✅ D-AUTH / D-SOLO **tranchés 01/09** ; D-HERO provisoire |
 | Éviter le théorique long | ✅ section « Comment lire » + horizons |
 
 ### 5. Verdict
@@ -102,6 +102,28 @@ Voilà l'analyse IA de ton associé Design !
 | 28/08/2026 | Clarification priorisation : ancien backlog → SOON ; NOW = quick wins audit en premier ; section « Comment lire » ajoutée |
 | 28/08/2026 | **Validation cohérence Designer.md** : checklist validée avec réserves (voir section dédiée) |
 | 28/08/2026 | **Lot NOW livré** : E1–E4, C1, C6, B2, B3, H2, A2 (wording D-HERO provisoire) — build OK |
+| 28/08/2026 | **Lot N ajouté (pas encore codé)** : statut pilote pendant une sortie + CSV `pilot_status` ; N7 = immédiat ; fiche pilote déjà OK |
+| 28/08/2026 | **Lot N implémenté** (code local) : FlightForm statut immédiat + PIN ; CSV export/import `pilot_status` — en attente commit explicite |
+| 31/08/2026 | **B1 + plafond hero** : accueil `max-h-[42vh]` + `object-cover` ; pages internes bandeau ~112–120px (copy réduite) — Designer.md |
+| 31/08/2026 | **Hero relevé** (feedback trop petit) : accueil `min-h-[300px]` / `max-h-[52vh]` ; internes `h-40`/`h-44` (~160–176px) |
+| 31/08/2026 | **Hero différencié** : accueil `min-h-[320px]` / `max-h-[58vh]` ; internes très réduits `h-24`/`6.5rem` (~96–104px) |
+| 31/08/2026 | **Hero accueil → 80vh** (choix produit explicite ; avis Designer était 58–60vh) ; internes inchangés ~96–104px |
+| 31/08/2026 | **Hero accueil → 70vh** (essai après 80vh) |
+| 31/08/2026 | **Hero accueil → 58vh** (validé produit = avis Designer) ; internes ~96–104px |
+| 31/08/2026 | **Hero accueil → 50vh** (nouvel essai) |
+| 31/08/2026 | **Hero anti-pixelisation ultra-wide** : image `object-contain` max 1672px centrée ; fond `bg-deep` + dégradés latéraux |
+| 31/08/2026 | **Fix fades** : dégradés collés aux bords de l’image (ratio 1672/941), pas aux bords viewport |
+| 31/08/2026 | **Hero 85% largeur** + `object-cover` (zoom pages internes) + fades latéraux — corrige bandeau trop étroit |
+| 31/08/2026 | **Hero → fit** : retour `object-contain` ratio 1672/941, centré ; abandon 85% + dégradés |
+| 31/08/2026 | **Hero → cover zoom** : plein cadre `object-cover` (accueil + internes) |
+| 31/08/2026 | **SOON G1+G5** : filtres escadrille + statut (Actifs défaut) sur classements |
+| 31/08/2026 | **SOON C2** : erreurs inline formulaire log (bordure + message par champ) |
+| 31/08/2026 | **SOON C3** : skeleton édition vol + présélection sans course hydrated |
+| 31/08/2026 | **SOON C4+C5** : form log Qui/Quoi/Mission + mémorisation localStorage |
+| 31/08/2026 | **SOON A1/D1–D3/F1/G2** : onboarding, tendances KPIs, score live, top 3 escadrille, mobile 44px, CTAs |
+| 01/09/2026 | **D-AUTH C′ + D-SOLO tranchés** : vision comptes niveau escadrille ; court terme PIN ; Solo = escadrille système hors classements (doc only, pas d’impl.) |
+| 01/09/2026 | **P-MERGE ajouté LATER** : fusion de deux pilotes (doublons) uniquement si connecté (après H1-impl) |
+| 01/09/2026 | **SOON G3/G6/post-save** : drop CSV, PilotRow, bannière « Modifications enregistrées » |
 
 ---
 
@@ -116,6 +138,7 @@ Voilà l'analyse IA de ton associé Design !
 - [x] Nav **sticky** décorrélée de l’image hero
 - [x] Fil d’Ariane ; hero kicker + titre + promesse
 - [x] Favicon LOG bleu nuit
+- [x] **Hero différencié** : accueil **50vh** ; internes ~96–104px ; image **cover zoom** (`object-cover` plein cadre)
 
 ### Produit cœur
 - [x] Dashboard (temps par sim / avion, cards collapsibles, CTA log)
@@ -137,15 +160,15 @@ Avis Designer : **Garder** / **Adapter** / **Reporter** / **Déjà couvert**
 
 | # | Item audit | Statut produit | Avis Designer.md | Pourquoi |
 |---|------------|----------------|------------------|----------|
-| A1 | Checklist onboarding 3 étapes (escadrille → pilote → vol) | ⬜ | **Garder** — SOON | NN/g H10 + biais Zeigarnik ; activation club |
+| A1 | Checklist onboarding 3 étapes (escadrille → pilote → vol) | ✅ « Premiers pas » dashboard | **Garder** — SOON | NN/g H10 + biais Zeigarnik ; activation club |
 | A2 | Clarifier proposition de valeur hero | 🟡 Hero existe (« Multi-sim flight log ») mais encore anglo + peu CTA | **Adapter** — NOW | Krug : clarifier en FR + CTA explicite, sans landing marketing lourde |
-| A3 | Mode pilote solo (sans escadrille) | ⬜ Escadrille obligatoire | **Reporter** — LATER | NN/g H7 ok, mais casse le modèle club actuel ; décider avant code |
+| A3 | Mode pilote solo (sans escadrille) | ⏸ **Décidé** : escadrille système « Solo » (pas de `squadronId` null) ; hors classements | **Adapter** — LATER (impl.) | Pseudo-solo ; migration / rattach possible vers une vraie escadrille |
 
 ### 🏗 Architecture & Navigation
 
 | # | Item audit | Statut produit | Avis Designer.md | Pourquoi |
 |---|------------|----------------|------------------|----------|
-| B1 | Header compact pages internes (80–100px) | ⬜ Hero plein partout | **Garder** — SOON critique | NN/g H1 + Fitts ; KPIs masqués = friction |
+| B1 | Header compact pages internes | ✅ Accueil **50vh** (essai) ; internes ~96–104px | **Adapter** — en test 31/08 | Itérations hauteur accueil |
 | B2 | Fusionner Accueil / Tableau de bord | 🟡 « Accueil » + lien « Tableau de bord » | **Garder** — NOW | NN/g H4 cohérence ; redondance cognitive |
 | B3 | Boutons « Retour » contextuels | 🟡 Breadcrumbs présents, pas de Retour métier | **Adapter** — NOW | H3 contrôle ; breadcrumbs ≠ Retour explicite sur édition |
 
@@ -154,19 +177,19 @@ Avis Designer : **Garder** / **Adapter** / **Reporter** / **Déjà couvert**
 | # | Item audit | Statut produit | Avis Designer.md | Pourquoi |
 |---|------------|----------------|------------------|----------|
 | C1 | Astérisques champs obligatoires | ⬜ Toast générique seulement | **Garder** — NOW critique | Material + NN/g H9 |
-| C2 | Erreurs inline contextuelles | ⬜ Toasts Sonner | **Garder** — SOON | Form error state Material ; toast ≠ localisation erreur |
-| C3 | Skeleton + présélection pilote édition | 🟡 Édition charge le vol ; skeleton absent | **Garder** — SOON | NN/g H1 ; prévention d’erreur |
-| C4 | Formulaire log en 3 sections Qui/Quoi/Mission | ⬜ Formulaire plat | **Garder** — SOON | Gestalt proximité + Miller |
-| C5 | Mémoriser dernières valeurs | ⬜ | **Garder** — SOON | NN/g H6 efficacité club |
+| C2 | Erreurs inline contextuelles | ✅ Messages + bordure sous chaque champ requis | **Garder** — SOON | Form error state Material ; toast ≠ localisation erreur |
+| C3 | Skeleton + présélection pilote édition | ✅ Skeleton édition + reset pilot/avion seulement au changement user | **Garder** — SOON | NN/g H1 ; prévention d’erreur |
+| C4 | Formulaire log en 3 sections Qui/Quoi/Mission | ✅ Sections Qui / Quoi / Mission | **Garder** — SOON | Gestalt proximité + Miller |
+| C5 | Mémoriser dernières valeurs | ✅ localStorage escadrille / pilote / sim (création) | **Garder** — SOON | NN/g H6 efficacité club |
 | C6 | Helper sur bouton désactivé (création pilote) | ⬜ | **Garder** — NOW | NN/g H1 ; déjà noté audit p.29 |
 
 ### 📊 Data Visualization & KPIs
 
 | # | Item audit | Statut produit | Avis Designer.md | Pourquoi |
 |---|------------|----------------|------------------|----------|
-| D1 | Tendances KPIs (Δ % vs période) | ⬜ | **Garder** — SOON | Biais de progression |
-| D2 | Score temps réel dans le formulaire log | ⬜ Points calculés après coup | **Garder** — SOON | Gamification légère, aligne scoring déjà livré |
-| D3 | Mini-leaderboard top 3 page escadrille | ⬜ | **Garder** — SOON | Compétition sociale Persona 3 |
+| D1 | Tendances KPIs (Δ % vs période) | ✅ Δ 30 j. vs 30 j. préc. sous KPIs | **Garder** — SOON | Biais de progression |
+| D2 | Score temps réel dans le formulaire log | ✅ Score estimé live (kills + durée) | **Garder** — SOON | Gamification légère, aligne scoring déjà livré |
+| D3 | Mini-leaderboard top 3 page escadrille | ✅ Top 3 points + CTAs | **Garder** — SOON | Compétition sociale Persona 3 |
 
 ### 🎨 Design System & Cohérence
 
@@ -181,25 +204,26 @@ Avis Designer : **Garder** / **Adapter** / **Reporter** / **Déjà couvert**
 
 | # | Item audit | Statut produit | Avis Designer.md | Pourquoi |
 |---|------------|----------------|------------------|----------|
-| F1 | Audit mobile 390px (tap 44px, tables, hamburger) | ⬜ Non formalisé | **Garder** — SOON | Apple HIG touch targets |
+| F1 | Audit mobile 390px (tap 44px, tables, hamburger) | ✅ Targets 44px nav/theme + selects full-width mobile | **Garder** — SOON | Apple HIG touch targets |
 | F2 | Log mobile rapide 3 champs | ⬜ | **Adapter** — LATER | Utile post-mission ; après form sections desktop |
 
 ### ⚙ Fonctionnalités manquantes
 
 | # | Item audit | Statut produit | Avis Designer.md | Pourquoi |
 |---|------------|----------------|------------------|----------|
-| G1 | Filtre escadrille leaderboard | ⬜ Période + sim seulement | **Garder** — SOON haute | Persona 3 ; déjà parking produit |
-| G2 | CTAs contextuels fiche escadrille | ⬜ | **Garder** — SOON | Next best action |
-| G3 | Zone drop CSV + feedback états | 🟡 Import file présent, UI basique | **Garder** — SOON | Material file upload + H1 |
+| G1 | Filtre escadrille leaderboard | ✅ Select escadrille | **Garder** — SOON haute | Persona 3 ; déjà parking produit |
+| G2 | CTAs contextuels fiche escadrille | ✅ Ajouter pilote + Enregistrer un vol | **Garder** — SOON | Next best action |
+| G3 | Zone drop CSV + feedback états | ✅ Drop zone + états idle/drag/upload/ok/erreur | **Garder** — SOON | Material file upload + H1 |
 | G4 | Grades / jalons (Aspirant → Major) | ⬜ Points existent | **Reporter** — LATER | Fort effort ; après fiabilité NOW/SOON |
-| G5 | Filtre statut pilote leaderboard | ⬜ (parking produit, pas audit p.31) | **Garder** — SOON | Cohérent avec G1 |
-| G6 | PilotCard / PilotRow unique | ⬜ (parking produit) | **Garder** — SOON | Cohérence visuelle DS |
+| G5 | Filtre statut pilote leaderboard | ✅ Actifs (défaut) / Tous | **Garder** — SOON | Cohérent avec G1 |
+| G6 | PilotCard / PilotRow unique | ✅ `PilotRow` listes pilotes + fiche escadrille | **Garder** — SOON | Cohérence visuelle DS |
+| P-MERGE | Fusionner deux pilotes (doublons) | ⬜ | **Garder** — LATER | Après H1-impl ; réservé aux sessions connectées |
 
 ### 🔐 Auth & comptes
 
 | # | Item audit | Statut produit | Avis Designer.md | Pourquoi |
 |---|------------|----------------|------------------|----------|
-| H1 | Décision public vs multi-comptes | ⏸ Club trust + PIN ; pas de login | **Décider** — LATER (doc NOW) | Product clarity ; ne pas coder sans choix |
+| H1 | Décision public vs multi-comptes | ✅ **D-AUTH C′ tranché** (voir Décisions) — code auth plus tard | **Décidé** — doc OK ; impl. LATER | Comptes vision = niveau escadrille ; court terme PIN |
 | H2 | Expliquer usage PIN | ⬜ Helper insuffisant | **Garder** — NOW | NN/g H10 |
 
 ### 🚀 Différenciation (vision)
@@ -207,8 +231,8 @@ Avis Designer : **Garder** / **Adapter** / **Reporter** / **Déjà couvert**
 | # | Item audit | Statut produit | Avis Designer.md | Pourquoi |
 |---|------------|----------------|------------------|----------|
 | I1 | Collecteur local DCS/IL-2 | ⬜ | **Reporter** — LATER | Fort effort / maintenance formats |
-| I2 | Page escadrille publique partageable | ⬜ | **Reporter** — LATER | Après décision auth/public |
-| I3 | Sauvegarde cloud premium | ⬜ CSV seulement | **Reporter** — LATER | Freemium ; hors MVP club |
+| I2 | Page escadrille publique partageable | ⬜ | **Reporter** — LATER | Après lot auth escadrille (D-AUTH C′) |
+| I3 | Sauvegarde cloud premium | ⬜ CSV seulement | **Reporter** — LATER | Freemium ; lié comptes / backup org |
 
 ---
 
@@ -306,36 +330,85 @@ Ordre d’implémentation : **E1 → E2 → C1 → E3 → B2/B3 → H2 → A2 �
 - [x] Implémenté *(passe axe manuelle restante)*
 
 #### Hors-scope NOW (renvoyé SOON / LATER)
-Filtres leaderboard (G1/G5), header compact (B1), erreurs inline (C2), onboarding 3 étapes (A1), grades (G4), auth multi-comptes (H1), solo sans escadrille (A3), PilotCard (G6), mobile 390px (F1), log mobile rapide (F2).
+Filtres leaderboard (G1/G5), erreurs inline (C2), onboarding 3 étapes (A1), grades (G4), auth multi-comptes (H1), solo sans escadrille (A3), PilotCard (G6), mobile 390px (F1), log mobile rapide (F2).
 
 ### SOON — Différenciation légère (1–3 mois)
 
-- [ ] **B1** Header compact sur pages internes (hero plein = accueil seulement)
-- [ ] **C2** Erreurs inline formulaire log
-- [ ] **C3** Skeleton loader édition + présélection fiable
-- [ ] **C4** Formulaire log en 3 sections Qui / Quoi / Mission
-- [ ] **C5** Mémoriser dernières valeurs (escadrille / pilote / sim)
-- [ ] **G1** Filtre escadrille leaderboard
-- [ ] **G5** Filtre statut pilote (Actif / tous)
-- [ ] **A1** Checklist onboarding progressive dashboard
-- [ ] **D2** Score estimé temps réel dans le log
-- [ ] **D3** Mini-leaderboard top 3 fiche escadrille
-- [ ] **G2** CTAs contextuels fiche escadrille
-- [ ] **G3** Zone drop CSV + états feedback
-- [ ] **D1** Tendances KPIs dashboard
-- [ ] **G6** Composant `PilotCard` / `PilotRow` unique
-- [ ] **F1** Audit mobile 390px + correctifs tap targets
-- [ ] Confirmation visuelle post-save édition vol (parking produit)
+#### Lot N — Statut pilote (fiche + sortie) & export CSV *(priorité produit 28/08)*
+
+**Résultat N :** pouvoir modifier le statut **Actif / Hors comb.** sur la fiche pilote **et** pendant une sortie ; les exports (et imports) tiennent compte du statut.
+
+| ID | Tâche | Détail | Statut |
+|----|--------|--------|--------|
+| N0 | Fiche pilote — édition statut | Déjà livré (`PilotEditForm` + `PUT /api/pilots/[id]`) | [x] |
+| N1 | Afficher le statut dans `FlightForm` | Badge Actif / Hors comb. dès qu’un pilote est sélectionné | [x] |
+| N2 | Contrôle de changement de statut dans le log | Select ou toggle dans `/log` (et édition vol) | [x] |
+| N3 | Réutiliser `PUT /api/pilots/[id]` | Pas de nouvel endpoint — même champ `Pilot.status` | [x] |
+| N4 | PIN avant changement de statut | Si `hasPin`, vérifier PIN (comme à la sélection pilote) | [x] |
+| N5 | Feedback après changement | Toast + rafraîchir badge / liste pilotes | [x] |
+| N6 | Parité édition de vol | Même UI statut en mode `edit` de `FlightForm` | [x] |
+| N7 | Timing du save statut | **Tranché : immédiat** (API dès le toggle, sans attendre submit du vol) | [x] |
+| N8 | Colonne CSV `pilot_status` | Ajouter à `FLIGHT_CSV_HEADERS` | [x] |
+| N9 | Export vols | Inclure `flight.pilot.status` dans `GET /api/flights/export` | [x] |
+| N10 | Import vols — lecture | Lire `pilot_status` si présent ; sinon défaut `ACTIVE` (rétrocompat) | [x] |
+| N11 | Import vols — application | Mettre à jour le statut du pilote à l’import (dernière occurrence gagne) | [x] |
+| N12 | Export roster pilotes (optionnel) | `/api/pilots/export` sans exposer le PIN — **hors scope N v1** | [ ] reporté |
+| N13 | Helper UX | Texte : « Met à jour le statut du pilote (pas seulement ce vol). » | [x] |
+| N14 | Checklist / journal | Ce bloc + journal | [x] |
+
+**Hors scope N v1 :** grades, filtre leaderboard statut (déjà G5), nouvel endpoint dédié.
+
+**Ordre d’implémentation suggéré :** N1→N5 (+ N13) → N6 → N8→N11. Ne pas committer sans accord explicite.
+
+---
+
+- [x] **N1–N6, N8–N11, N13** Lot N — statut pendant sortie + CSV *(implémenté 28/08 — pas encore commit)*
+- [x] **B1** Header compact pages internes + plafond hero accueil (~42vh) — *31/08/2026*
+- [x] **G1** Filtre escadrille leaderboard — *31/08/2026*
+- [x] **G5** Filtre statut pilote (Actifs / tous) — *31/08/2026*
+- [x] **C2** Erreurs inline formulaire log — *31/08/2026*
+- [x] **C3** Skeleton loader édition + présélection fiable — *31/08/2026*
+- [x] **C4** Formulaire log en 3 sections Qui / Quoi / Mission — *31/08/2026*
+- [x] **C5** Mémoriser dernières valeurs (escadrille / pilote / sim) — *31/08/2026*
+- [x] **A1** Checklist onboarding progressive dashboard — *31/08/2026*
+- [x] **D1** Tendances KPIs dashboard — *31/08/2026*
+- [x] **D2** Score estimé temps réel dans le log — *31/08/2026*
+- [x] **D3** Mini-leaderboard top 3 fiche escadrille — *31/08/2026*
+- [x] **G2** CTAs contextuels fiche escadrille — *31/08/2026*
+- [x] **G3** Zone drop CSV + états feedback — *01/09/2026*
+- [x] **G6** Composant `PilotCard` / `PilotRow` unique — *01/09/2026*
+- [x] **F1** Audit mobile 390px + correctifs tap targets — *31/08/2026*
+- [x] Confirmation visuelle post-save édition vol — *01/09/2026*
 
 ### LATER — Étendre sans diluer (3–9 mois)
 
-- [ ] **H1** Décision documentée : carnet public club vs multi-comptes (+ rôles)
-- [ ] **A3** Mode pilote solo (si décision OK)
+#### Décisions produit validées (01/09/2026) — à implémenter plus tard
+
+**D-AUTH = C′ (réadapté)**  
+- **Court terme :** pas d’auth multi-comptes à coder ; carnet déployé + PIN.  
+- **Vision :** comptes rattachés à l’**escadrille** (rôles admin / membre), pas « un user = un carnet perso ».  
+- **Solo :** saisie possible avec PIN ; **périmètre réduit** (pas toutes les fonctions club).  
+- Exclusions solo typiques (à figer en impl.) : classements club, grades, page publique, export roster, CTAs escadrille. Conservé : log de vol, historique perso, statut.
+
+**D-SOLO = escadrille système « Solo »**  
+- Pas de `Pilot.squadronId` nullable.  
+- Escadrille système seedée **« Solo »** ; badge UI dédié.  
+- **Exclue des classements** pilotes **et** escadrilles (filtre API, pas seulement cosmétique).  
+- Un pilote Solo **peut** plus tard être rattaché à une vraie escadrille.  
+- Affichage listes : masquer ou griser « Solo » comme escadrille « club » (détail UI à l’impl.).
+
+#### Backlog LATER (après / selon décisions)
+
+- [x] **H1** Décision documentée D-AUTH C′ — *01/09/2026* *(impl. auth escadrille = lot futur)*
+- [x] **D-SOLO** Décision documentée — escadrille système Solo hors classements — *01/09/2026*
+- [ ] **A3** Impl. support Solo (seed + UI badge + exclusion leaderboard + rattach)
+- [ ] **H1-impl** Comptes au niveau escadrille (quand le besoin multi-clubs / SaaS se présente)
+- [ ] **P-MERGE** Fusionner deux pilotes (doublons) — **uniquement si connecté** (après H1-impl) ; réaffecter vols / kills / points vers le pilote cible, supprimer ou archiver la source
 - [ ] **G4** Grades / jalons configurables
 - [ ] **F2** Log mobile rapide 3 champs
 - [ ] **I1** Collecteur local DCS/IL-2
-- [ ] **I2** Escadrille publique partageable
-- [ ] **I3** Sauvegarde cloud optionnelle
+- [ ] **I2** Escadrille publique partageable *(après H1-impl)*
+- [ ] **I3** Sauvegarde cloud optionnelle *(après H1-impl + modèle freemium)*
 
 ---
 
@@ -343,9 +416,10 @@ Filtres leaderboard (G1/G5), header compact (B1), erreurs inline (C2), onboardin
 
 | ID | Question | Impact | Statut |
 |----|----------|--------|--------|
-| D-AUTH | Carnet club public (PIN) vs multi-comptes OAuth/email | H1, I2 | Ouvert |
-| D-SOLO | Autoriser pilote sans escadrille ? | A3 | Ouvert — défaut actuel : non |
+| D-AUTH | Carnet club public (PIN) vs multi-comptes OAuth/email | H1, I2, I3 | **Tranché C′** — court terme PIN / pas d’OAuth ; vision comptes **niveau escadrille** ; solo = fonctions limitées (*01/09/2026*) |
+| D-SOLO | Autoriser pilote sans escadrille ? | A3 | **Tranché** — escadrille système « Solo » ; hors classements ; rattach possible (*01/09/2026*) |
 | D-HERO | Accroche FR exacte + CTA | A2 | **Tranché provisoire** — « Carnet multi-simulateurs » + CTA « Enregistrer un vol » (ajustable) |
+| D-N7 | Quand sauver le statut pendant une sortie ? | Lot N | **Tranché** — immédiat (API dès le contrôle, pas au submit du vol) |
 
 ---
 
@@ -367,8 +441,30 @@ Filtres leaderboard (G1/G5), header compact (B1), erreurs inline (C2), onboardin
 - Décision bloquante notée : **D-HERO** pour A2
 - Log journal mis à jour (même date)
 
+### 28/08/2026 — Lot N planifié puis implémenté
+- Besoin : statut modifiable **fiche pilote** (déjà OK) **et pendant une sortie**
+- Export/import CSV avec `pilot_status`
+- N7 tranché : save **immédiat**
+- **Code livré localement** (N1–N6, N8–N11, N13) ; commit uniquement sur accord explicite
+
+### 31/08/2026 — Hero plafonné (Designer.md + B1)
+- **Problème :** grand écran → hero full-bleed trop haut
+- **Itérations :** 42 → 52 → 58 → 80 → 70 → 58 → **50vh (essai)**
+- **v actuelle :**
+  - Accueil : **`h-[50vh]`** ; image **cover** plein cadre (`object-cover`)
+  - Internes : bandeau bas ; même cover (zoom sur le centre)
+  - Côtés viewport : `bg-bg-deep` ; fades sur les bords de l’image
+- Fichiers : `src/components/nav.tsx`, `src/styles/globals.css` (`.header-side-fade-*`)
+
+### 01/09/2026 — Reportés LATER : décisions produit
+- **D-AUTH C′ :** court terme PIN / pas d’OAuth ; vision comptes **niveau escadrille** ; solo = fonctions limitées
+- **D-SOLO :** escadrille système « Solo » (pas de nullable) ; **hors classements** pilotes + escadrilles ; rattach vers vraie escadrille OK
+- H1 documenté `[x]` ; A3 / H1-impl / I2 / I3 restent backlog LATER (code plus tard)
+- **P-MERGE** ajouté : fusion pilotes (doublons) réservée aux utilisateurs connectés, après auth escadrille
+- Aucune implémentation Solo/auth/merge dans ce log — doc only
+
 ### Prochaine action recommandée
-**Lot NOW terminé.** Enchaîner **SOON** — commencer par **G1** filtre escadrille leaderboard (+ G5 statut), puis C2/C3 formulaires ou G6 PilotCard selon priorité produit.
+Finir commit sur demande. SOON checklist complété (G3/G6/post-save). Ensuite LATER (A3 Solo, etc.) quand priorisé.
 
 ---
 

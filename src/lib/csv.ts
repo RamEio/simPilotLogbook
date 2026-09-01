@@ -8,6 +8,7 @@ export const FLIGHT_CSV_HEADERS = [
   "squadron_tag",
   "pilot",
   "callsign",
+  "pilot_status",
   "mission_type",
   "mission_name",
   "outcome",

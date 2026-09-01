@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { OutcomeBadge } from "@/components/outcome-badge";
@@ -45,9 +45,19 @@ export default function FlightDetailPage() {
   const router = useRouter();
   const [flight, setFlight] = useState<FlightDetail | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [showSaved, setShowSaved] = useState(false);
 
   useEffect(() => {
     void apiFetch<FlightDetail>(`/api/flights/${params.id}`).then(setFlight);
+  }, [params.id]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const query = new URLSearchParams(window.location.search);
+    if (query.get("saved") === "1") {
+      setShowSaved(true);
+      window.history.replaceState(null, "", `/flights/${params.id}`);
+    }
   }, [params.id]);
 
   async function remove() {
@@ -84,6 +94,37 @@ export default function FlightDetailPage() {
         <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
         Retour à l&apos;historique
       </Link>
+
+      {showSaved ? (
+        <div
+          role="status"
+          className="flex items-start justify-between gap-3 rounded border border-status-success/40 bg-status-success/10 px-3 py-3"
+        >
+          <div className="flex items-start gap-2">
+            <Check
+              className="mt-0.5 h-4 w-4 shrink-0 text-status-success"
+              strokeWidth={2}
+            />
+            <div>
+              <p className="text-sm font-medium text-ink-primary">
+                Modifications enregistrées
+              </p>
+              <p className="text-caption text-ink-secondary">
+                Le vol a bien été mis à jour.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="inline-flex h-8 w-8 items-center justify-center rounded text-ink-muted hover:bg-bg-hover hover:text-ink-primary"
+            aria-label="Fermer"
+            onClick={() => setShowSaved(false)}
+          >
+            <X className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+        </div>
+      ) : null}
+
       <p className="overline overline-amber">Opérations / Vol</p>
       <h1 className="sr-only">Détail du vol</h1>
       <Card>

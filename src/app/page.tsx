@@ -1,42 +1,118 @@
 import Link from "next/link";
+import { Check } from "lucide-react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CollapsibleCard } from "@/components/collapsible-card";
 import { FlightCard } from "@/components/flight-card";
 import { Button } from "@/components/ui/button";
 import { GAMES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import { formatCount, formatHours } from "@/lib/utils";
+import { cn, formatCount, formatHours } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
+function deltaPct(current: number, previous: number): number | null {
+  if (previous === 0) {
+    return current === 0 ? 0 : null;
+  }
+  return Math.round(((current - previous) / previous) * 100);
+}
+
+function formatDelta(delta: number | null): string {
+  if (delta === null) return "n/a vs 30 j. préc.";
+  const sign = delta > 0 ? "+" : "";
+  return `${sign}${delta}% vs 30 j. préc.`;
+}
+
 export default async function DashboardPage() {
-  const [totalFlights, duration, recentFlights, groupedByGame, groupedByAircraft] =
-    await Promise.all([
-      prisma.flight.count(),
-      prisma.flight.aggregate({ _sum: { duration: true } }),
-      prisma.flight.findMany({
-        include: {
-          aircraft: true,
-          pilot: true,
-          squadron: true,
-        },
-        orderBy: { date: "desc" },
-        take: 5,
-      }),
-      prisma.flight.groupBy({
-        by: ["game"],
-        _sum: { duration: true },
-      }),
-      prisma.flight.groupBy({
-        by: ["aircraftId"],
-        _sum: { duration: true },
-        _count: { _all: true },
-        orderBy: { _sum: { duration: "desc" } },
-        take: 12,
-      }),
-    ]);
+  const now = new Date();
+  const d30 = new Date(now);
+  d30.setDate(d30.getDate() - 30);
+  const d60 = new Date(now);
+  d60.setDate(d60.getDate() - 60);
+
+  const [
+    totalFlights,
+    duration,
+    recentFlights,
+    groupedByGame,
+    groupedByAircraft,
+    squadronCount,
+    pilotCount,
+    flights30,
+    minutes30,
+    flightsPrev30,
+    minutesPrev30,
+  ] = await Promise.all([
+    prisma.flight.count(),
+    prisma.flight.aggregate({ _sum: { duration: true } }),
+    prisma.flight.findMany({
+      include: {
+        aircraft: true,
+        pilot: true,
+        squadron: true,
+      },
+      orderBy: { date: "desc" },
+      take: 5,
+    }),
+    prisma.flight.groupBy({
+      by: ["game"],
+      _sum: { duration: true },
+    }),
+    prisma.flight.groupBy({
+      by: ["aircraftId"],
+      _sum: { duration: true },
+      _count: { _all: true },
+      orderBy: { _sum: { duration: "desc" } },
+      take: 12,
+    }),
+    prisma.squadron.count(),
+    prisma.pilot.count(),
+    prisma.flight.count({ where: { date: { gte: d30 } } }),
+    prisma.flight.aggregate({
+      where: { date: { gte: d30 } },
+      _sum: { duration: true },
+    }),
+    prisma.flight.count({ where: { date: { gte: d60, lt: d30 } } }),
+    prisma.flight.aggregate({
+      where: { date: { gte: d60, lt: d30 } },
+      _sum: { duration: true },
+    }),
+  ]);
 
   const totalMinutes = duration._sum.duration ?? 0;
+  const currentMinutes30 = minutes30._sum.duration ?? 0;
+  const previousMinutes30 = minutesPrev30._sum.duration ?? 0;
+  const flightsDelta = deltaPct(flights30, flightsPrev30);
+  const hoursDelta = deltaPct(currentMinutes30, previousMinutes30);
+
+  const hasSquadron = squadronCount > 0;
+  const hasPilot = pilotCount > 0;
+  const hasFlight = totalFlights > 0;
+  const showOnboarding = !hasSquadron || !hasPilot || !hasFlight;
+
+  const onboardingSteps = [
+    {
+      id: "squadron",
+      label: "Créer une escadrille",
+      href: "/squadrons/new",
+      done: hasSquadron,
+      enabled: true,
+    },
+    {
+      id: "pilot",
+      label: "Ajouter un pilote",
+      href: "/pilots/new",
+      done: hasPilot,
+      enabled: hasSquadron,
+    },
+    {
+      id: "flight",
+      label: "Enregistrer un premier vol",
+      href: "/log",
+      done: hasFlight,
+      enabled: hasSquadron && hasPilot,
+    },
+  ] as const;
 
   const byGame = GAMES.map((game) => ({
     ...game,
@@ -81,13 +157,71 @@ export default async function DashboardPage() {
         </Button>
       </div>
 
+      {showOnboarding ? (
+        <CollapsibleCard title="Premiers pas">
+          <ol className="space-y-2">
+            {onboardingSteps.map((step, index) => (
+              <li key={step.id}>
+                <div
+                  className={cn(
+                    "flex items-center justify-between gap-3 rounded border px-3 py-2.5",
+                    step.done
+                      ? "border-line-subtle bg-bg-elevated text-ink-muted"
+                      : "border-line-default bg-bg-card",
+                  )}
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span
+                      className={cn(
+                        "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm",
+                        step.done
+                          ? "border-status-success/40 bg-status-success/15 text-status-success"
+                          : "border-line-default text-ink-secondary",
+                      )}
+                      aria-hidden
+                    >
+                      {step.done ? (
+                        <Check className="h-4 w-4" strokeWidth={2} />
+                      ) : (
+                        index + 1
+                      )}
+                    </span>
+                    <span
+                      className={cn(
+                        "text-sm",
+                        step.done
+                          ? "line-through text-ink-muted"
+                          : "text-ink-primary",
+                      )}
+                    >
+                      {step.label}
+                    </span>
+                  </div>
+                  {!step.done && step.enabled ? (
+                    <Button asChild variant="secondary">
+                      <Link href={step.href}>Aller</Link>
+                    </Button>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </CollapsibleCard>
+      ) : null}
+
       <div className="grid gap-3 sm:grid-cols-2">
         <CollapsibleCard title="Vols">
           <p className="text-display text-ink-primary">{totalFlights}</p>
+          <p className="mt-1 text-caption text-ink-muted">
+            30 j. : {flights30} · {formatDelta(flightsDelta)}
+          </p>
         </CollapsibleCard>
         <CollapsibleCard title="Heures de vol">
           <p className="text-display text-ink-primary">
             {formatHours(totalMinutes)}
+          </p>
+          <p className="mt-1 text-caption text-ink-muted">
+            30 j. : {formatHours(currentMinutes30)} · {formatDelta(hoursDelta)}
           </p>
         </CollapsibleCard>
       </div>
@@ -148,8 +282,7 @@ export default async function DashboardPage() {
       <CollapsibleCard title="Derniers vols">
         {recentFlights.length === 0 ? (
           <p className="text-sm text-ink-secondary">
-            Aucun vol enregistré. Commence par créer une escadrille et un
-            pilote, puis enregistre ta première sortie.
+            Aucun vol enregistré pour l’instant.
           </p>
         ) : (
           <div className="grid gap-3">

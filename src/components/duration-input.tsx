@@ -7,10 +7,12 @@ export function DurationInput({
   hours,
   minutes,
   onChange,
+  error,
 }: {
   hours: number;
   minutes: number;
   onChange: (hours: number, minutes: number) => void;
+  error?: string;
 }) {
   return (
     <div className="space-y-2">
@@ -24,6 +26,9 @@ export function DurationInput({
             id="hours"
             type="number"
             min={0}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? "error-duration" : undefined}
+            className={error ? "border-status-error focus-visible:border-status-error" : undefined}
             value={Number.isNaN(hours) ? "" : hours}
             onChange={(event) =>
               onChange(Number(event.target.value), minutes)
@@ -39,11 +44,18 @@ export function DurationInput({
             type="number"
             min={0}
             max={59}
+            aria-invalid={Boolean(error)}
+            className={error ? "border-status-error focus-visible:border-status-error" : undefined}
             value={Number.isNaN(minutes) ? "" : minutes}
             onChange={(event) => onChange(hours, Number(event.target.value))}
           />
         </div>
       </div>
+      {error ? (
+        <p id="error-duration" className="text-caption text-status-error" role="alert">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { Game, Outcome } from "@/lib/constants";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import {
+  CsvDropZone,
+  type CsvImportResult,
+} from "@/components/csv-drop-zone";
 import { FlightCard, type FlightCardData } from "@/components/flight-card";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +40,8 @@ export default function FlightsPage() {
   const [page, setPage] = useState(1);
   const [data, setData] = useState<FlightsResponse | null>(null);
   const [importing, setImporting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const sortRef = useRef(sort);
+  sortRef.current = sort;
 
   useEffect(() => {
     void apiFetch<Squadron[]>("/api/squadrons").then(setSquadrons);
@@ -58,10 +63,12 @@ export default function FlightsPage() {
     if (outcome !== "all") params.set("outcome", outcome);
     params.set("sort", sort);
     params.set("page", String(page));
-    void apiFetch<FlightsResponse>(`/api/flights?${params.toString()}`).then(setData);
+    void apiFetch<FlightsResponse>(`/api/flights?${params.toString()}`).then(
+      setData,
+    );
   }, [game, squadronId, pilotId, outcome, sort, page]);
 
-  async function onImport(file: File) {
+  const onImport = useCallback(async (file: File): Promise<CsvImportResult> => {
     setImporting(true);
     try {
       const form = new FormData();
@@ -71,30 +78,38 @@ export default function FlightsPage() {
         body: form,
       });
       const payload = (await response.json().catch(() => null)) as
-        | { error?: string; created?: number; skipped?: number }
+        | {
+            error?: string;
+            created?: number;
+            skipped?: number;
+            total?: number;
+          }
         | null;
       if (!response.ok) {
         throw new Error(payload?.error ?? "Import impossible");
       }
+      const result: CsvImportResult = {
+        created: payload?.created ?? 0,
+        skipped: payload?.skipped ?? 0,
+        total: payload?.total ?? 0,
+      };
       toast.success(
-        `${payload?.created ?? 0} vol(s) importé(s)` +
-          (payload?.skipped ? `, ${payload.skipped} déjà présent(s)` : ""),
+        `${result.created} vol(s) importé(s)` +
+          (result.skipped ? `, ${result.skipped} déjà présent(s)` : ""),
       );
       setPage(1);
       const params = new URLSearchParams();
-      params.set("sort", sort);
+      params.set("sort", sortRef.current);
       params.set("page", "1");
-      const refreshed = await apiFetch<FlightsResponse>(`/api/flights?${params.toString()}`);
+      const refreshed = await apiFetch<FlightsResponse>(
+        `/api/flights?${params.toString()}`,
+      );
       setData(refreshed);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Import impossible");
+      return result;
     } finally {
       setImporting(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
     }
-  }
+  }, []);
 
   return (
     <div className="space-y-6 fade-in">
@@ -108,32 +123,12 @@ export default function FlightsPage() {
             Apply.Build, réimporte ce fichier pour restaurer les vols.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button asChild variant="secondary">
-            <a href="/api/flights/export">Exporter CSV</a>
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={importing}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            {importing ? "Import…" : "Importer CSV"}
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv,text/csv"
-            className="hidden"
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (file) {
-                void onImport(file);
-              }
-            }}
-          />
-        </div>
+        <Button asChild variant="secondary">
+          <a href="/api/flights/export">Exporter CSV</a>
+        </Button>
       </div>
+
+      <CsvDropZone onImport={onImport} disabled={importing} />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Select
@@ -227,10 +222,16 @@ export default function FlightsPage() {
       <div className="grid gap-3">
         {data?.items.length ? (
           data.items.map((flight) => (
-            <FlightCard key={flight.id} href={`/flights/${flight.id}`} flight={flight} />
+            <FlightCard
+              key={flight.id}
+              href={`/flights/${flight.id}`}
+              flight={flight}
+            />
           ))
         ) : (
-          <p className="text-sm text-ink-secondary">Aucun vol pour ces filtres.</p>
+          <p className="text-sm text-ink-secondary">
+            Aucun vol pour ces filtres.
+          </p>
         )}
       </div>
 

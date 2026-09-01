@@ -46,9 +46,17 @@ type SquadronRank = {
   points: number;
 };
 
+type SquadronOption = {
+  id: string;
+  name: string;
+  tag: string | null;
+};
+
 type LeaderboardResponse = {
   period: string;
   game: string;
+  squadronId: string;
+  status: string;
   rules: string;
   pilots: PilotRank[];
   squadrons: SquadronRank[];
@@ -133,8 +141,17 @@ function formatMetric(
 export default function LeaderboardPage() {
   const [period, setPeriod] = useState("all");
   const [game, setGame] = useState<Game | "all">("all");
+  const [squadronId, setSquadronId] = useState("all");
+  const [status, setStatus] = useState<"ACTIVE" | "all">("ACTIVE");
   const [board, setBoard] = useState<Board>("points");
+  const [squadronOptions, setSquadronOptions] = useState<SquadronOption[]>(
+    [],
+  );
   const [data, setData] = useState<LeaderboardResponse | null>(null);
+
+  useEffect(() => {
+    void apiFetch<SquadronOption[]>("/api/squadrons").then(setSquadronOptions);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -142,10 +159,16 @@ export default function LeaderboardPage() {
     if (game !== "all") {
       params.set("game", game);
     }
+    if (squadronId !== "all") {
+      params.set("squadronId", squadronId);
+    }
+    if (status !== "all") {
+      params.set("status", status);
+    }
     void apiFetch<LeaderboardResponse>(
       `/api/stats/leaderboard?${params.toString()}`,
     ).then(setData);
-  }, [period, game]);
+  }, [period, game, squadronId, status]);
 
   const pilots = useMemo(() => {
     if (!data) return [];
@@ -186,7 +209,7 @@ export default function LeaderboardPage() {
             value={board}
             onValueChange={(value) => setBoard(value as Board)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="min-h-11 w-full sm:w-[180px]">
               <SelectValue placeholder="Classement" />
             </SelectTrigger>
             <SelectContent>
@@ -198,7 +221,7 @@ export default function LeaderboardPage() {
             </SelectContent>
           </Select>
           <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="min-h-11 w-full sm:w-[160px]">
               <SelectValue placeholder="Période" />
             </SelectTrigger>
             <SelectContent>
@@ -211,7 +234,7 @@ export default function LeaderboardPage() {
             value={game}
             onValueChange={(value) => setGame(value as Game | "all")}
           >
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="min-h-11 w-full sm:w-[160px]">
               <SelectValue placeholder="Simulateur" />
             </SelectTrigger>
             <SelectContent>
@@ -221,6 +244,33 @@ export default function LeaderboardPage() {
                   {item.short}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+          <Select value={squadronId} onValueChange={setSquadronId}>
+            <SelectTrigger className="min-h-11 w-full sm:w-[180px]">
+              <SelectValue placeholder="Escadrille" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes les escadrilles</SelectItem>
+              {squadronOptions.map((squadron) => (
+                <SelectItem key={squadron.id} value={squadron.id}>
+                  {squadron.tag
+                    ? `${squadron.tag} — ${squadron.name}`
+                    : squadron.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={status}
+            onValueChange={(value) => setStatus(value as "ACTIVE" | "all")}
+          >
+            <SelectTrigger className="min-h-11 w-full sm:w-[150px]">
+              <SelectValue placeholder="Statut" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ACTIVE">Actifs</SelectItem>
+              <SelectItem value="all">Tous les pilotes</SelectItem>
             </SelectContent>
           </Select>
         </div>

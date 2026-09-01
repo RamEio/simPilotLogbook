@@ -1,18 +1,10 @@
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { PilotRow } from "@/components/pilot-row";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { pilotStatusMeta } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import { formatCount } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
-
-function statusBadgeVariant(status: string) {
-  if (status === "ACTIVE") return "success" as const;
-  return "error" as const;
-}
 
 export default async function PilotsPage() {
   const pilots = await prisma.pilot.findMany({
@@ -40,20 +32,18 @@ export default async function PilotsPage() {
           <p className="text-sm text-ink-secondary">Aucun pilote.</p>
         ) : (
           pilots.map((pilot) => (
-            <Link key={pilot.id} href={`/pilots/${pilot.id}`}>
-              <Card className="transition-colors hover:border-line-default hover:bg-bg-hover">
-                <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
-                  <CardTitle>{pilot.callsign ?? pilot.name}</CardTitle>
-                  <Badge variant={statusBadgeVariant(pilot.status)}>
-                    {pilotStatusMeta(pilot.status).label}
-                  </Badge>
-                </CardHeader>
-                <CardContent className="text-sm text-ink-secondary">
-                  {pilot.squadron.tag ?? pilot.squadron.name} ·{" "}
-                  {formatCount(pilot._count.flights, "vol")}
-                </CardContent>
-              </Card>
-            </Link>
+            <PilotRow
+              key={pilot.id}
+              href={`/pilots/${pilot.id}`}
+              pilot={{
+                id: pilot.id,
+                name: pilot.name,
+                callsign: pilot.callsign,
+                status: pilot.status,
+                squadronName: pilot.squadron.tag ?? pilot.squadron.name,
+                flightCount: pilot._count.flights,
+              }}
+            />
           ))
         )}
       </div>

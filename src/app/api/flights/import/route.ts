@@ -1,10 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GAME_VALUES, OUTCOME_VALUES, type Game, type Outcome } from "@/lib/constants";
+import {
+  GAME_VALUES,
+  OUTCOME_VALUES,
+  PILOT_STATUS_VALUES,
+  type Game,
+  type Outcome,
+  type PilotStatus,
+} from "@/lib/constants";
 import { parseCsv, rowsToFlightCsv } from "@/lib/csv";
 import { handleError, jsonError } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+function parsePilotStatus(value: string): PilotStatus {
+  const normalized = value.trim().toUpperCase();
+  if (PILOT_STATUS_VALUES.includes(normalized as PilotStatus)) {
+    return normalized as PilotStatus;
+  }
+  if (normalized === "ALIVE" || normalized === "ACTIF") {
+    return "ACTIVE";
+  }
+  if (
+    normalized === "OUT_OF_COMBAT" ||
+    normalized === "OUT_OF_ACTION" ||
+    normalized.includes("HORS")
+  ) {
+    return "OUT_OF_ACTION";
+  }
+  return "ACTIVE";
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,12 +63,16 @@ export async function POST(request: NextRequest) {
       }
 
       if (row.id) {
-        const existing = await prisma.flight.findUnique({ where: { id: row.id } });
+        const existing = await prisma.flight.findUnique({
+          where: { id: row.id },
+        });
         if (existing) {
           skipped += 1;
           continue;
         }
       }
+
+      const pilotStatus = parsePilotStatus(row.pilot_status ?? "");
 
       const squadron = await prisma.squadron.upsert({
         where: { name: row.squadron },
@@ -55,20 +84,31 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      const pilot =
-        (await prisma.pilot.findFirst({
-          where: {
-            squadronId: squadron.id,
-            name: row.pilot,
+      let pilot = await prisma.pilot.findFirst({
+        where: {
+          squadronId: squadron.id,
+          name: row.pilot,
+        },
+      });
+
+      if (pilot) {
+        pilot = await prisma.pilot.update({
+          where: { id: pilot.id },
+          data: {
+            callsign: row.callsign || undefined,
+            status: pilotStatus,
           },
-        })) ??
-        (await prisma.pilot.create({
+        });
+      } else {
+        pilot = await prisma.pilot.create({
           data: {
             name: row.pilot,
             callsign: row.callsign || undefined,
             squadronId: squadron.id,
+            status: pilotStatus,
           },
-        }));
+        });
+      }
 
       const aircraft =
         (await prisma.aircraft.findUnique({
@@ -116,7 +156,10 @@ export async function POST(request: NextRequest) {
       "code" in error &&
       typeof (error as Record<string, unknown>).code === "string"
     ) {
-      const prismaError = error as { code: string; meta?: Record<string, unknown> };
+      const prismaError = error as {
+        code: string;
+        meta?: Record<string, unknown>;
+      };
       return jsonError(
         `Erreur base de données (${prismaError.code}): ${JSON.stringify(prismaError.meta ?? {})}`,
         400,

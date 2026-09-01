@@ -36,7 +36,7 @@ export function PilotStatusToggle({
       onClick={() => void toggle()}
       title={isActive ? "Mettre hors de combat" : "Remettre en service"}
       className={cn(
-        "rounded px-2 py-1 text-overline font-medium uppercase tracking-overline transition-colors",
+        "inline-flex min-h-11 items-center rounded px-3 py-2 text-overline font-medium uppercase tracking-overline transition-colors",
         isActive
           ? "border border-status-success/40 text-status-success hover:bg-status-success/10"
           : "border border-status-error/40 text-status-error hover:bg-status-error/10",

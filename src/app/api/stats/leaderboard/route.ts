@@ -49,7 +49,24 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
     const period = searchParams.get("period") ?? "all";
     const gameParam = searchParams.get("game");
+    const squadronId = searchParams.get("squadronId");
+    const statusParam = searchParams.get("status");
     const start = periodStart(period);
+    const statusActiveOnly = statusParam === "ACTIVE";
+
+    const pilotWhere: Prisma.PilotWhereInput = {};
+    if (squadronId) {
+      pilotWhere.squadronId = squadronId;
+    }
+    if (statusActiveOnly) {
+      pilotWhere.status = "ACTIVE";
+    }
+
+    const pilots = await prisma.pilot.findMany({
+      where: pilotWhere,
+      include: { squadron: true },
+      orderBy: { name: "asc" },
+    });
 
     const where: Prisma.FlightWhereInput = {};
     if (start) {
@@ -58,13 +75,40 @@ export async function GET(request: NextRequest) {
     if (gameParam && GAME_VALUES.includes(gameParam as Game)) {
       where.game = gameParam;
     }
+    if (squadronId) {
+      where.squadronId = squadronId;
+    }
+    if (statusActiveOnly) {
+      if (pilots.length === 0) {
+        where.pilotId = { in: [] };
+      } else {
+        where.pilotId = { in: pilots.map((pilot) => pilot.id) };
+      }
+    }
 
-    const [pilots, squadrons, flights] = await Promise.all([
-      prisma.pilot.findMany({
-        include: { squadron: true },
+    const emptyResponse = {
+      period,
+      game:
+        gameParam && GAME_VALUES.includes(gameParam as Game)
+          ? gameParam
+          : "all",
+      squadronId: squadronId ?? "all",
+      status: statusActiveOnly ? "ACTIVE" : "all",
+      rules:
+        "Aérien 5 · Naval 4 · Sol 3 · Building 2 · 1 h de vol 1",
+      pilots: [] as never[],
+      squadrons: [] as never[],
+    };
+
+    if (statusActiveOnly && pilots.length === 0) {
+      return NextResponse.json(emptyResponse);
+    }
+
+    const [squadrons, flights] = await Promise.all([
+      prisma.squadron.findMany({
+        where: squadronId ? { id: squadronId } : undefined,
         orderBy: { name: "asc" },
       }),
-      prisma.squadron.findMany({ orderBy: { name: "asc" } }),
       prisma.flight.findMany({
         where,
         select: {
@@ -166,6 +210,8 @@ export async function GET(request: NextRequest) {
         gameParam && GAME_VALUES.includes(gameParam as Game)
           ? gameParam
           : "all",
+      squadronId: squadronId ?? "all",
+      status: statusActiveOnly ? "ACTIVE" : "all",
       rules:
         "Aérien 5 · Naval 4 · Sol 3 · Building 2 · 1 h de vol 1",
       pilots: pilotRanks,

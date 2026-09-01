@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { Game, Outcome } from "@/lib/constants";
@@ -28,8 +28,22 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { apiFetch } from "@/lib/api";
-import { MISSION_TYPES } from "@/lib/constants";
-import { KILL_CATEGORIES, POINTS_RULES_LABEL } from "@/lib/scoring";
+import {
+  GAME_VALUES,
+  MISSION_TYPES,
+  PILOT_STATUSES,
+  type PilotStatus,
+} from "@/lib/constants";
+import { KILL_CATEGORIES, POINTS_RULES_LABEL, flightTotalPoints } from "@/lib/scoring";
+import { cn } from "@/lib/utils";
+
+const LOG_DEFAULTS_KEY = "spl-log-defaults";
+
+type LogDefaults = {
+  squadronId?: string;
+  pilotId?: string;
+  game?: Game;
+};
 
 type Squadron = { id: string; name: string; tag: string | null };
 type Pilot = {
@@ -37,8 +51,45 @@ type Pilot = {
   name: string;
   callsign: string | null;
   squadronId: string;
+  status?: string;
   hasPin?: boolean;
 };
+
+type FieldKey =
+  | "squadronId"
+  | "pilotId"
+  | "game"
+  | "aircraftId"
+  | "duration"
+  | "outcome";
+
+type FieldErrors = Partial<Record<FieldKey, string>>;
+
+function FieldError({ id, message }: { id: string; message?: string }) {
+  if (!message) return null;
+  return (
+    <p id={id} className="text-caption text-status-error" role="alert">
+      {message}
+    </p>
+  );
+}
+
+function FormSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="space-y-4 border-t border-line-subtle pt-6 first:border-t-0 first:pt-0">
+      <h2 className="text-overline font-medium uppercase tracking-overline text-amber-400">
+        {title}
+      </h2>
+      <div className="space-y-4">{children}</div>
+    </section>
+  );
+}
 
 export type FlightFormInitial = {
   id: string;
@@ -89,13 +140,15 @@ export function FlightForm({
     initial?.killsBuilding ?? 0,
   );
   const [submitting, setSubmitting] = useState(false);
-  const [hydrated, setHydrated] = useState(mode === "create");
   const [verifiedPilotId, setVerifiedPilotId] = useState<string | null>(
     mode === "edit" ? initial?.pilotId ?? null : null,
   );
   const [pinOpen, setPinOpen] = useState(false);
   const [pinError, setPinError] = useState<string | null>(null);
   const [pendingPilotId, setPendingPilotId] = useState<string | null>(null);
+  const [pinPurpose, setPinPurpose] = useState<"select" | "status">("select");
+  const [pendingStatus, setPendingStatus] = useState<PilotStatus | null>(null);
+  const [statusSaving, setStatusSaving] = useState(false);
 
   const [squadronOpen, setSquadronOpen] = useState(false);
   const [pilotOpen, setPilotOpen] = useState(false);
@@ -106,65 +159,135 @@ export function FlightForm({
   const [newPilotCallsign, setNewPilotCallsign] = useState("");
   const [newPilotPin, setNewPilotPin] = useState("");
   const [newAircraftName, setNewAircraftName] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const defaultsApplied = useRef(false);
+  const rememberedPilotId = useRef<string | null>(null);
+
+  function clearFieldError(key: FieldKey) {
+    setFieldErrors((current) => {
+      if (!current[key]) return current;
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
+  }
 
   useEffect(() => {
     void apiFetch<Squadron[]>("/api/squadrons").then(setSquadrons);
   }, []);
 
   useEffect(() => {
+    if (mode !== "create" || defaultsApplied.current || squadrons.length === 0) {
+      return;
+    }
+    defaultsApplied.current = true;
+    try {
+      const raw = window.localStorage.getItem(LOG_DEFAULTS_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as LogDefaults;
+      if (
+        parsed.squadronId &&
+        squadrons.some((squadron) => squadron.id === parsed.squadronId)
+      ) {
+        setSquadronId(parsed.squadronId);
+        rememberedPilotId.current = parsed.pilotId ?? null;
+      }
+      if (parsed.game && GAME_VALUES.includes(parsed.game)) {
+        setGame(parsed.game);
+      }
+    } catch {
+      // ignore corrupt localStorage
+    }
+  }, [mode, squadrons]);
+
+  useEffect(() => {
     if (!squadronId) {
       setPilots([]);
-      if (hydrated) {
-        setPilotId("");
-      }
       return;
     }
     void apiFetch<Pilot[]>(`/api/pilots?squadronId=${squadronId}`).then(
-      (items) => {
-        setPilots(items);
-        if (hydrated) {
-          setPilotId("");
-          setVerifiedPilotId(null);
-        }
-      },
+      setPilots,
     );
-  }, [squadronId, hydrated]);
+  }, [squadronId]);
+
+  useEffect(() => {
+    if (mode !== "create" || !rememberedPilotId.current || pilots.length === 0) {
+      return;
+    }
+    const remembered = rememberedPilotId.current;
+    rememberedPilotId.current = null;
+    if (pilots.some((pilot) => pilot.id === remembered)) {
+      setPilotId(remembered);
+    }
+  }, [mode, pilots]);
 
   useEffect(() => {
     if (!game) {
       setAircraft([]);
-      if (hydrated) {
-        setAircraftId("");
-      }
       return;
     }
     void apiFetch<AircraftOption[]>(`/api/aircraft?game=${game}`).then(
-      (items) => {
-        setAircraft(items);
-        if (hydrated) {
-          setAircraftId("");
-        }
-      },
+      setAircraft,
     );
-  }, [game, hydrated]);
-
-  useEffect(() => {
-    if (mode === "edit" && initial) {
-      const timer = window.setTimeout(() => setHydrated(true), 0);
-      return () => window.clearTimeout(timer);
-    }
-  }, [mode, initial]);
+  }, [game]);
 
   function requestPilotChange(nextPilotId: string) {
     const pilot = pilots.find((item) => item.id === nextPilotId);
     if (pilot?.hasPin && verifiedPilotId !== nextPilotId) {
+      setPinPurpose("select");
+      setPendingStatus(null);
       setPendingPilotId(nextPilotId);
       setPinError(null);
       setPinOpen(true);
       return;
     }
     setPilotId(nextPilotId);
-    setVerifiedPilotId(pilot?.hasPin ? nextPilotId : nextPilotId);
+    setVerifiedPilotId(nextPilotId);
+  }
+
+  async function savePilotStatus(id: string, status: PilotStatus) {
+    setStatusSaving(true);
+    try {
+      const updated = await apiFetch<Pilot>(`/api/pilots/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ status }),
+      });
+      setPilots((current) =>
+        current.map((pilot) =>
+          pilot.id === id
+            ? { ...pilot, status: updated.status ?? status }
+            : pilot,
+        ),
+      );
+      toast.success(
+        status === "ACTIVE" ? "Pilote passé Actif" : "Pilote hors comb.",
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Impossible de mettre à jour le statut",
+      );
+    } finally {
+      setStatusSaving(false);
+    }
+  }
+
+  function requestStatusChange(nextStatus: PilotStatus) {
+    if (!pilotId) {
+      return;
+    }
+    const pilot = pilots.find((item) => item.id === pilotId);
+    if (!pilot || (pilot.status ?? "ACTIVE") === nextStatus) {
+      return;
+    }
+    if (pilot.hasPin && verifiedPilotId !== pilotId) {
+      setPinPurpose("status");
+      setPendingStatus(nextStatus);
+      setPendingPilotId(pilotId);
+      setPinError(null);
+      setPinOpen(true);
+      return;
+    }
+    void savePilotStatus(pilotId, nextStatus);
   }
 
   async function verifyPin(pin: string) {
@@ -176,12 +299,23 @@ export function FlightForm({
         method: "POST",
         body: JSON.stringify({ pilotId: pendingPilotId, pin }),
       });
-      setPilotId(pendingPilotId);
-      setVerifiedPilotId(pendingPilotId);
-      setPendingPilotId(null);
+      const unlockedId = pendingPilotId;
+      setVerifiedPilotId(unlockedId);
       setPinOpen(false);
       setPinError(null);
+      setPendingPilotId(null);
+      clearFieldError("pilotId");
       toast.success("PIN validé");
+
+      if (pinPurpose === "status" && pendingStatus) {
+        const status = pendingStatus;
+        setPendingStatus(null);
+        setPinPurpose("select");
+        await savePilotStatus(unlockedId, status);
+      } else {
+        setPilotId(unlockedId);
+        setPinPurpose("select");
+      }
     } catch (error) {
       setPinError(error instanceof Error ? error.message : "PIN incorrect");
     }
@@ -200,6 +334,8 @@ export function FlightForm({
         [...current, created].sort((a, b) => a.name.localeCompare(b.name)),
       );
       setSquadronId(created.id);
+      setPilotId("");
+      setVerifiedPilotId(null);
       setSquadronOpen(false);
       setNewSquadronName("");
       setNewSquadronTag("");
@@ -266,8 +402,17 @@ export function FlightForm({
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     const duration = durationToMinutes(hours, minutes);
-    if (!squadronId || !pilotId || !game || !aircraftId || !outcome || duration <= 0) {
-      toast.error("Complète les champs obligatoires");
+    const nextErrors: FieldErrors = {};
+    if (!squadronId) nextErrors.squadronId = "Sélectionnez une escadrille.";
+    if (!pilotId) nextErrors.pilotId = "Sélectionnez un pilote.";
+    if (!game) nextErrors.game = "Choisissez un simulateur.";
+    if (!aircraftId) nextErrors.aircraftId = "Choisissez un avion.";
+    if (duration <= 0) nextErrors.duration = "Indiquez une durée supérieure à 0.";
+    if (!outcome) nextErrors.outcome = "Indiquez le résultat du vol.";
+
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors(nextErrors);
+      toast.error("Corrigez les champs indiqués");
       return;
     }
 
@@ -276,10 +421,14 @@ export function FlightForm({
       setPendingPilotId(pilotId);
       setPinError(null);
       setPinOpen(true);
-      toast.error("Valide le PIN du pilote");
+      setFieldErrors({
+        pilotId: "Validez le PIN du pilote pour continuer.",
+      });
+      toast.error("Validez le PIN du pilote");
       return;
     }
 
+    setFieldErrors({});
     setSubmitting(true);
     try {
       const payload = {
@@ -304,12 +453,24 @@ export function FlightForm({
           body: JSON.stringify(payload),
         });
         toast.success("Vol modifié");
-        router.push(`/flights/${initial.id}`);
+        router.push(`/flights/${initial.id}?saved=1`);
       } else {
         await apiFetch("/api/flights", {
           method: "POST",
           body: JSON.stringify(payload),
         });
+        try {
+          window.localStorage.setItem(
+            LOG_DEFAULTS_KEY,
+            JSON.stringify({
+              squadronId,
+              pilotId,
+              game,
+            } satisfies LogDefaults),
+          );
+        } catch {
+          // ignore quota / private mode
+        }
         toast.success("Vol enregistré");
         router.push("/flights");
       }
@@ -324,6 +485,16 @@ export function FlightForm({
   }
 
   const pendingPilot = pilots.find((item) => item.id === pendingPilotId);
+  const selectedPilot = pilots.find((item) => item.id === pilotId);
+  const estimatedPoints = flightTotalPoints(
+    {
+      killsAir,
+      killsNaval,
+      killsGround,
+      killsBuilding,
+    },
+    durationToMinutes(hours, minutes),
+  );
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 fade-in">
@@ -350,10 +521,28 @@ export function FlightForm({
       </div>
 
       <form className="space-y-6" onSubmit={(event) => void onSubmit(event)}>
+        <FormSection title="Qui">
         <div className="space-y-2">
           <Label required>Escadrille</Label>
-          <Select value={squadronId || undefined} onValueChange={setSquadronId}>
-            <SelectTrigger>
+          <Select
+            value={squadronId || undefined}
+            onValueChange={(value) => {
+              setSquadronId(value);
+              setPilotId("");
+              setVerifiedPilotId(null);
+              clearFieldError("squadronId");
+              clearFieldError("pilotId");
+            }}
+          >
+            <SelectTrigger
+              aria-invalid={Boolean(fieldErrors.squadronId)}
+              aria-describedby={
+                fieldErrors.squadronId ? "error-squadronId" : undefined
+              }
+              className={cn(
+                fieldErrors.squadronId && "border-status-error focus:border-status-error",
+              )}
+            >
               <SelectValue placeholder="Sélectionner une escadrille" />
             </SelectTrigger>
             <SelectContent>
@@ -365,6 +554,7 @@ export function FlightForm({
               ))}
             </SelectContent>
           </Select>
+          <FieldError id="error-squadronId" message={fieldErrors.squadronId} />
           {mode === "create" ? (
             <Button
               type="button"
@@ -381,10 +571,21 @@ export function FlightForm({
           <Label required>Pilote</Label>
           <Select
             value={pilotId || undefined}
-            onValueChange={requestPilotChange}
+            onValueChange={(value) => {
+              requestPilotChange(value);
+              clearFieldError("pilotId");
+            }}
             disabled={!squadronId}
           >
-            <SelectTrigger>
+            <SelectTrigger
+              aria-invalid={Boolean(fieldErrors.pilotId)}
+              aria-describedby={
+                fieldErrors.pilotId ? "error-pilotId" : undefined
+              }
+              className={cn(
+                fieldErrors.pilotId && "border-status-error focus:border-status-error",
+              )}
+            >
               <SelectValue placeholder="Sélectionner un pilote" />
             </SelectTrigger>
             <SelectContent>
@@ -396,6 +597,7 @@ export function FlightForm({
               ))}
             </SelectContent>
           </Select>
+          <FieldError id="error-pilotId" message={fieldErrors.pilotId} />
           {mode === "create" ? (
             <Button
               type="button"
@@ -408,9 +610,52 @@ export function FlightForm({
           ) : null}
         </div>
 
+        {selectedPilot ? (
+          <div className="space-y-2">
+            <Label>Statut du pilote</Label>
+            <Select
+              value={
+                PILOT_STATUSES.some((s) => s.value === selectedPilot.status)
+                  ? selectedPilot.status
+                  : "ACTIVE"
+              }
+              onValueChange={(value) =>
+                requestStatusChange(value as PilotStatus)
+              }
+              disabled={statusSaving}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent>
+                {PILOT_STATUSES.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-caption text-ink-muted">
+              Met à jour le statut du pilote (pas seulement ce vol).
+            </p>
+          </div>
+        ) : null}
+        </FormSection>
+
+        <FormSection title="Quoi">
         <div className="space-y-2">
           <Label required>Simulateur</Label>
-          <GameSelector value={game} onChange={setGame} />
+          <GameSelector
+            value={game}
+            invalid={Boolean(fieldErrors.game)}
+            onChange={(value) => {
+              setGame(value);
+              setAircraftId("");
+              clearFieldError("game");
+              clearFieldError("aircraftId");
+            }}
+          />
+          <FieldError id="error-game" message={fieldErrors.game} />
         </div>
 
         <div className="space-y-2">
@@ -419,9 +664,14 @@ export function FlightForm({
             key={`${game || "none"}-${aircraftId || "empty"}`}
             aircraft={aircraft}
             value={aircraftId}
-            onChange={setAircraftId}
+            invalid={Boolean(fieldErrors.aircraftId)}
+            onChange={(value) => {
+              setAircraftId(value);
+              if (value) clearFieldError("aircraftId");
+            }}
             disabled={!game}
           />
+          <FieldError id="error-aircraftId" message={fieldErrors.aircraftId} />
           <Button
             type="button"
             variant="link"
@@ -435,12 +685,31 @@ export function FlightForm({
         <DurationInput
           hours={hours}
           minutes={minutes}
+          error={fieldErrors.duration}
           onChange={(nextHours, nextMinutes) => {
             setHours(nextHours);
             setMinutes(nextMinutes);
+            if (durationToMinutes(nextHours, nextMinutes) > 0) {
+              clearFieldError("duration");
+            }
           }}
         />
 
+        <div className="space-y-2">
+          <Label required>Résultat</Label>
+          <OutcomeSelector
+            value={outcome}
+            invalid={Boolean(fieldErrors.outcome)}
+            onChange={(value) => {
+              setOutcome(value);
+              clearFieldError("outcome");
+            }}
+          />
+          <FieldError id="error-outcome" message={fieldErrors.outcome} />
+        </div>
+        </FormSection>
+
+        <FormSection title="Mission">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="missionName">Nom de mission</Label>
@@ -469,11 +738,6 @@ export function FlightForm({
               </SelectContent>
             </Select>
           </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label required>Résultat</Label>
-          <OutcomeSelector value={outcome} onChange={setOutcome} />
         </div>
 
         <div className="space-y-3">
@@ -516,6 +780,15 @@ export function FlightForm({
               );
             })}
           </div>
+          <p className="text-sm text-ink-secondary" aria-live="polite">
+            Score estimé :{" "}
+            <span className="font-medium text-ink-primary">
+              {Math.round(estimatedPoints * 10) / 10} pts
+            </span>
+            <span className="ml-2 text-caption text-ink-muted">
+              (kills + durée)
+            </span>
+          </p>
         </div>
 
         <div className="space-y-2">
@@ -527,6 +800,7 @@ export function FlightForm({
             placeholder="Optionnel"
           />
         </div>
+        </FormSection>
 
         <p className="text-caption text-ink-muted">
           <span className="text-status-error" aria-hidden>
@@ -550,6 +824,8 @@ export function FlightForm({
           setPinOpen(open);
           if (!open) {
             setPendingPilotId(null);
+            setPendingStatus(null);
+            setPinPurpose("select");
             setPinError(null);
           }
         }}
@@ -561,6 +837,11 @@ export function FlightForm({
             onSubmit={(pin) => void verifyPin(pin)}
             className="max-w-none border-0 bg-transparent p-0 shadow-none"
           />
+          {pinPurpose === "status" ? (
+            <p className="mt-2 text-caption text-ink-muted">
+              PIN requis pour modifier le statut du pilote.
+            </p>
+          ) : null}
         </DialogContent>
       </Dialog>
 

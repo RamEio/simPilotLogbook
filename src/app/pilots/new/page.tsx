@@ -27,7 +27,16 @@ export default function NewPilotPage() {
   const [squadronId, setSquadronId] = useState("");
 
   useEffect(() => {
-    void apiFetch<Squadron[]>("/api/squadrons").then(setSquadrons);
+    const preset =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("squadronId")
+        : null;
+    void apiFetch<Squadron[]>("/api/squadrons").then((items) => {
+      setSquadrons(items);
+      if (preset && items.some((squadron) => squadron.id === preset)) {
+        setSquadronId(preset);
+      }
+    });
   }, []);
 
   async function onSubmit(event: React.FormEvent) {
