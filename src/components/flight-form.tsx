@@ -460,14 +460,16 @@ export function FlightForm({
           body: JSON.stringify(payload),
         });
         try {
-          window.localStorage.setItem(
-            LOG_DEFAULTS_KEY,
-            JSON.stringify({
-              squadronId,
-              pilotId,
-              game,
-            } satisfies LogDefaults),
-          );
+          if (game) {
+            window.localStorage.setItem(
+              LOG_DEFAULTS_KEY,
+              JSON.stringify({
+                squadronId,
+                pilotId,
+                game,
+              } satisfies LogDefaults),
+            );
+          }
         } catch {
           // ignore quota / private mode
         }
