@@ -351,107 +351,129 @@ function LeaderboardInner() {
       ? `Réussite = vols « Réussite totale » / vols. Classé à partir de ${minFlights} vols. Égalité : plus de vols, puis plus de points.`
       : "Égalité : plus de points, puis plus d’heures.";
 
+  const filterTriggerClass =
+    "min-h-11 w-full min-w-0 [&>span]:min-w-0 [&>span]:truncate";
+
   return (
     <div className="space-y-6 fade-in">
       <Breadcrumbs items={[{ label: "Classements" }]} />
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="overline overline-amber">Opérations / Classements</p>
-          <h1 className="mt-1 text-h1 text-ink-primary">Classements</h1>
-          <p className="mt-1 max-w-xl text-sm text-ink-secondary">
-            Heures, kills et points — pilotes et escadrilles.
+      <div>
+        <p className="overline overline-amber">Opérations / Classements</p>
+        <h1 className="mt-1 text-h1 text-ink-primary">Classements</h1>
+        <p className="mt-1 max-w-xl text-sm text-ink-secondary">
+          Heures, kills et points — pilotes et escadrilles.
+        </p>
+        <p className="mt-2 text-caption text-ink-muted">
+          Règle points : {data?.rules ?? POINTS_RULES_LABEL}
+        </p>
+        {data?.asOf ? (
+          <p className="mt-1 text-caption text-ink-muted">
+            Dernier vol : {formatDate(data.asOf)}
+            {data.spotlight
+              ? ` · dernière soirée ${formatDate(data.spotlight.date)} (${formatCount(data.spotlight.flightCount, "vol")})`
+              : ""}
           </p>
-          <p className="mt-2 text-caption text-ink-muted">
-            Règle points : {data?.rules ?? POINTS_RULES_LABEL}
-          </p>
-          {data?.asOf ? (
-            <p className="mt-1 text-caption text-ink-muted">
-              Dernier vol : {formatDate(data.asOf)}
-              {data.spotlight
-                ? ` · dernière soirée ${formatDate(data.spotlight.date)} (${formatCount(data.spotlight.flightCount, "vol")})`
-                : ""}
-            </p>
-          ) : null}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Select
-            value={board}
-            onValueChange={(value) => setBoard(value as Board)}
-          >
-            <SelectTrigger className="min-h-11 w-full sm:w-[180px]">
-              <SelectValue placeholder="Classement" />
-            </SelectTrigger>
-            <SelectContent>
-              {BOARDS.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="min-h-11 w-full sm:w-[160px]">
-              <SelectValue placeholder="Période" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes périodes</SelectItem>
-              <SelectItem value="30d">30 derniers jours</SelectItem>
-              <SelectItem value="year">Cette année</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select
-            value={game}
-            onValueChange={(value) => setGame(value as Game | "all")}
-          >
-            <SelectTrigger className="min-h-11 w-full sm:w-[160px]">
-              <SelectValue placeholder="Simulateur" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous simulateurs</SelectItem>
-              {GAMES.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.short}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={squadronId} onValueChange={setSquadronId}>
-            <SelectTrigger className="min-h-11 w-full sm:w-[180px]">
-              <SelectValue placeholder="Escadrille" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes les escadrilles</SelectItem>
-              {squadronOptions.map((squadron) => (
-                <SelectItem key={squadron.id} value={squadron.id}>
-                  {squadron.tag
-                    ? `${squadron.tag} — ${squadron.name}`
-                    : squadron.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={status}
-            onValueChange={(value) => setStatus(value as "ACTIVE" | "all")}
-          >
-            <SelectTrigger className="min-h-11 w-full sm:w-[150px]">
-              <SelectValue placeholder="Statut" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ACTIVE">Actifs</SelectItem>
-              <SelectItem value="all">Tous les pilotes</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        ) : null}
       </div>
 
-      <Input
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        placeholder="Trouver un pilote (nom ou indicatif)"
-        className="min-h-11 max-w-md"
-        aria-label="Trouver un pilote"
-      />
+      <div className="space-y-2">
+        <Input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Trouver un pilote (nom ou indicatif)"
+          className="min-h-11 w-full max-w-xl"
+          aria-label="Trouver un pilote"
+        />
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="min-w-0">
+            <Select
+              value={board}
+              onValueChange={(value) => setBoard(value as Board)}
+            >
+              <SelectTrigger
+                className={filterTriggerClass}
+                aria-label="Classement"
+              >
+                <SelectValue placeholder="Classement" />
+              </SelectTrigger>
+              <SelectContent>
+                {BOARDS.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="min-w-0">
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className={filterTriggerClass} aria-label="Période">
+                <SelectValue placeholder="Période" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes périodes</SelectItem>
+                <SelectItem value="30d">30 derniers jours</SelectItem>
+                <SelectItem value="year">Cette année</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="min-w-0">
+            <Select
+              value={game}
+              onValueChange={(value) => setGame(value as Game | "all")}
+            >
+              <SelectTrigger
+                className={filterTriggerClass}
+                aria-label="Simulateur"
+              >
+                <SelectValue placeholder="Simulateur" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous simulateurs</SelectItem>
+                {GAMES.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.short}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="min-w-0">
+            <Select value={squadronId} onValueChange={setSquadronId}>
+              <SelectTrigger
+                className={filterTriggerClass}
+                aria-label="Escadrille"
+              >
+                <SelectValue placeholder="Escadrille" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes les escadrilles</SelectItem>
+                {squadronOptions.map((squadron) => (
+                  <SelectItem key={squadron.id} value={squadron.id}>
+                    {squadron.tag
+                      ? `${squadron.tag} — ${squadron.name}`
+                      : squadron.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="min-w-0 col-span-2 sm:col-span-1">
+            <Select
+              value={status}
+              onValueChange={(value) => setStatus(value as "ACTIVE" | "all")}
+            >
+              <SelectTrigger className={filterTriggerClass} aria-label="Statut">
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ACTIVE">Actifs</SelectItem>
+                <SelectItem value="all">Tous les pilotes</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
 
       {data?.spotlight ? (
         <Card>

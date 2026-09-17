@@ -2,7 +2,7 @@
 
 > Suivi des travaux réalisés — Design System Korea v3.0 & évolutions produit  
 > Sources actives : `docs/simpilot_audit.pdf` (p.31–36) · `ASSETS/Designer.md` · parking produit  
-> Dernière mise à jour : **17 septembre 2026** (Lot A classements / fiche pilote)
+> Dernière mise à jour : **17 septembre 2026** (Lot A + toolbar filtres classements)
 
 ---
 
@@ -13,14 +13,15 @@
 |------|--------|
 | Branche | `deploiement-apply.build` |
 | Remote | `origin/deploiement-apply.build` |
-| Derniers commits utiles | Lot A (SW-A0–A10) 17/09 · `d672349` P-SORT · `3dde50e` fix build · `fa9bd03` lot SOON |
+| Derniers commits utiles | `bdeb833` Lot A (SW-A0–A10) · `d672349` P-SORT · `3dde50e` fix build · `fa9bd03` lot SOON |
 | Repo | https://github.com/RamEio/simPilotLogbook.git |
 | Apply.Build | Pousser cette branche déclenche le déploiement |
 
 ### Ce qui est **terminé**
 - **NOW** : tout `[x]` (E1–E4, C1, C6, B2, B3, H2, A2…)
 - **SOON** : tout `[x]` (G1/G5, C2–C5, A1, D1–D3, G2/G3/G6, F1, post-save, P-SORT, Lot N + hero)
-- **Lot A (SW-A0–A10)** : livré 17/09 — +1 pt SUCCESS, URL classements, search/highlight, gap, spotlight dernière soirée, heatmap, fiche carrière, board réussite, HoF, Δ rang
+- **Lot A (SW-A0–A10)** : livré 17/09 (`bdeb833`) — +1 pt SUCCESS, URL classements, search/highlight, gap, spotlight dernière soirée, heatmap, fiche carrière, board réussite, HoF, Δ rang
+- **SW-A11** : toolbar filtres classements pleine largeur (plus d’orphelin « Actifs »)
 - **Décisions** : D-AUTH C′, D-SOLO, D-N7, **D-SW1 / D-SW2 / D-SW3** tranchés ; D-HERO provisoire (ajustable)
 
 ### Prochain travail recommandé
@@ -165,7 +166,8 @@ Voilà l'analyse IA de ton associé Design !
 | 01/09/2026 | **Commits poussés** : `fa9bd03` SOON · `3dde50e` fix build · `d672349` P-SORT — branche à jour remote |
 | 01/09/2026 | **Handoff checklist** : NOW+SOON terminés ; prochain = LATER (A3 Solo en tête) ; section Handoff ajoutée en tête de doc |
 | 17/09/2026 | **D-SW1 / D-SW2 / D-SW3 tranchés** : grades FR révocables + hysteresis ; unité stats = Pilote ; SUCCESS = atterri, +1 pt, 5 outcomes conservés |
-| 17/09/2026 | **Lot A livré (SW-A0–A10)** : +1 pt SUCCESS (recalc à la volée), URL classements, search/highlight kiosque, gap rang, spotlight dernière soirée, heatmap club+fiche, barre outcomes / avions / records perso, board réussite (≥5 vols), HoF, Δ rang 30 j./année ; Solo exclu des classements (filtre API, seed A3 plus tard) |
+| 17/09/2026 | **Lot A livré (SW-A0–A10)** : +1 pt SUCCESS (recalc à la volée), URL classements, search/highlight kiosque, gap rang, spotlight dernière soirée, heatmap club+fiche, barre outcomes / avions / records perso, board réussite (≥5 vols), HoF, Δ rang 30 j./année ; Solo exclu des classements (filtre API, seed A3 plus tard) — commit `bdeb833` |
+| 17/09/2026 | **SW-A11** Toolbar filtres classements : plus à côté du H1 (`flex-wrap` orphelin « Actifs ») ; barre pleine largeur `lg:grid-cols-5` + recherche au-dessus (NN/g H6/H8, Gestalt, Material toolbar, HIG 44px) |
 
 ---
 
@@ -188,7 +190,7 @@ Voilà l'analyse IA de ton associé Design !
 - [x] Vols (liste, CSV, détail, édition, suppression + modale)
 - [x] Pilotes (fiche, statut Actif/Hors comb., PIN)
 - [x] Escadrilles (liste + fiche)
-- [x] Leaderboard (période + simulateur + 7 classements : heures / points / réussite / 4 kills ; URL state ; HoF ; spotlight)
+- [x] Leaderboard (période + simulateur + 7 classements : heures / points / réussite / 4 kills ; URL state ; HoF ; spotlight ; toolbar filtres pleine largeur)
 - [x] Scoring : Aérien 5 · Naval 4 · Sol 3 · Building 2 · 1 h = 1 · atterrissage SUCCESS = 1
 - [x] Heatmap activité (accueil + fiche pilote) ; fiche pilote carrière (outcomes, avions, records)
 - [x] Docker / Apply.Build (`deploiement-apply.build`)
@@ -443,8 +445,9 @@ Source : `docs/sidewinder_classements_pilot_analysis.md`. Hors-scope : grades (L
 | SW-A8 | Board réussite, seuil 5 vols, tie-break documenté | Pas de #1 à 1 vol 100 % | [x] |
 | SW-A9 | HoF compact (1 vol + carrière période) | Records cliquables | [x] |
 | SW-A10 | Δ rang vs période précédente (30 j. / année) | ▲▼ sur la row | [x] |
+| SW-A11 | Toolbar filtres pleine largeur (5 cols ≥ lg), recherche au-dessus | Plus d’orphelin « Actifs » ; une ligne de filtres desktop | [x] |
 
-- [x] **SW-A0–A10** Lot A classements / fiche / heatmap — *17/09/2026*
+- [x] **SW-A0–A11** Lot A classements / fiche / heatmap / toolbar — *17/09/2026*
 - [x] Exclusion API escadrille **Solo** dans `GET /api/stats/leaderboard` (A3 seed plus tard)
 
 ### LATER — Étendre sans diluer (3–9 mois)
@@ -543,6 +546,8 @@ Source : `docs/sidewinder_classements_pilot_analysis.md`. Hors-scope : grades (L
 - Livré : SW-A0–A10 (points, URL, search, gap, spotlight soirée, heatmap, fiche carrière, réussite, HoF, Δ rang)
 - **Hors-scope :** Lot B grades/badges/campagnes ; Lot C replay/cartes/14 boards
 - Règle points mise à jour : recalc historique à la volée (`flightTotalPoints` / `aggregatePoints`, rien de stocké)
+- Commit poussé : `bdeb833`
+- **SW-A11 (17/09 PM) :** filtres classements en barre pleine largeur (reco Designer.md : ne plus les coller à droite du H1)
 
 ---
 

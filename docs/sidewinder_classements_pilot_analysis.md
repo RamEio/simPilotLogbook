@@ -1,7 +1,7 @@
 # Analyse Sidewinder → Simpilot Log — classements & fiche pilote
 
 > Livrable Designer (ASSETS/Designer.md) pour remplir la checklist **dans un second temps**.  
-> **D-SW1, D-SW2, D-SW3 tranchés** (17/09/2026). **Lot A (SW-A0–A10) livré 17/09/2026.** Lot B (grades) et Lot C (replay) hors-scope.  
+> **D-SW1, D-SW2, D-SW3 tranchés** (17/09/2026). **Lot A (SW-A0–A11) livré 17/09/2026** (A11 = toolbar filtres pleine largeur). Lot B (grades) et Lot C (replay) hors-scope.  
 > Date : 17 septembre 2026 · Preuves : pages live + JS + API JSON Sidewinder (mission `2026-09-17_00-37-51`, Season 18, Day 28) · code Simpilot (`/leaderboard`, `/pilots/[id]`, `scoring.ts`, `schema.prisma`, checklist G4/I1/I2)
 
 **Sources :** Sidewinder `/stats/`, `/stats/leaderboards`, `/stats/ranks`, `/stats/records`, `/stats/pilot?id=1336` (Rameio) · NN/g H1/H4/H6/H8 · Fogg (triggers) · Zeigarnik / goal-gradient · Miller · Krug · Material tables · Apple HIG · audit Simpilot p.31+ · `docs/Checklist simpilot log.md` (G4, D-SOLO, I1, I2)
