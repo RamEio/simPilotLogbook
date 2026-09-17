@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { GAMES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { cn, formatCount, formatHours } from "@/lib/utils";
+import { ActivityCalendar } from "@/components/activity-calendar";
+import { getActivityCalendar } from "@/lib/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +44,7 @@ export default async function DashboardPage() {
     minutes30,
     flightsPrev30,
     minutesPrev30,
+    activity,
   ] = await Promise.all([
     prisma.flight.count(),
     prisma.flight.aggregate({ _sum: { duration: true } }),
@@ -77,6 +80,7 @@ export default async function DashboardPage() {
       where: { date: { gte: d60, lt: d30 } },
       _sum: { duration: true },
     }),
+    getActivityCalendar({ days: 365 }),
   ]);
 
   const totalMinutes = duration._sum.duration ?? 0;
@@ -225,6 +229,19 @@ export default async function DashboardPage() {
           </p>
         </CollapsibleCard>
       </div>
+
+      <CollapsibleCard title="Activité du club">
+        {activity.cells.length === 0 ? (
+          <p className="text-sm text-ink-secondary">
+            Aucun vol sur les 12 derniers mois.
+          </p>
+        ) : (
+          <ActivityCalendar
+            calendar={activity}
+            hrefForDate={(date) => `/flights?from=${date}&to=${date}`}
+          />
+        )}
+      </CollapsibleCard>
 
       <CollapsibleCard title="Répartition par simulateur">
         <div className="space-y-3">

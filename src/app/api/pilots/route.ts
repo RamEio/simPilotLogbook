@@ -52,6 +52,13 @@ export async function GET(request: NextRequest) {
     ) {
       where.status = statusParam;
     }
+    const q = searchParams.get("q")?.trim();
+    if (q) {
+      where.OR = [
+        { name: { contains: q } },
+        { callsign: { contains: q } },
+      ];
+    }
 
     const pilots = await prisma.pilot.findMany({
       where,

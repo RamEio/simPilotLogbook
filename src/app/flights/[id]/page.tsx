@@ -76,7 +76,7 @@ export default function FlightDetailPage() {
     killsGround: flight.killsGround ?? 0,
     killsBuilding: flight.killsBuilding ?? 0,
   };
-  const points = flightTotalPoints(kills, flight.duration);
+  const points = flightTotalPoints(kills, flight.duration, flight.outcome);
   const hasKills = KILL_CATEGORIES.some((cat) => kills[cat.key] > 0);
 
   return (

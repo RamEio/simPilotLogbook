@@ -236,3 +236,58 @@ body {
 .header-hero-copy h1 {
   color: #ffffff;
 }
+
+.heatcal-scroll {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.heatcal-months {
+  display: grid;
+  column-gap: 3px;
+  margin-bottom: 4px;
+  min-width: max-content;
+}
+
+.heatcal-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 0.7rem);
+  gap: 3px;
+  min-width: max-content;
+}
+
+.heatcal-cell {
+  display: block;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 2px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.heatcal-out {
+  visibility: hidden;
+  border-color: transparent;
+  background: transparent;
+}
+
+.heatcal-l1 {
+  background: color-mix(in srgb, var(--status-info) 28%, var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--status-info) 35%, var(--border-subtle));
+}
+
+.heatcal-l2 {
+  background: color-mix(in srgb, var(--status-info) 48%, var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--status-info) 45%, var(--border-subtle));
+}
+
+.heatcal-l3 {
+  background: color-mix(in srgb, var(--status-info) 72%, var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--status-info) 55%, var(--border-subtle));
+}
+
+.heatcal-l4 {
+  background: var(--status-info);
+  border-color: var(--status-info);
+}

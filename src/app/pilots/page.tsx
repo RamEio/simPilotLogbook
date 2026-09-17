@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PilotRow } from "@/components/pilot-row";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -30,17 +31,19 @@ export default function PilotsPage() {
   const [pilots, setPilots] = useState<PilotListItem[]>([]);
   const [status, setStatus] = useState<PilotStatus | "all">("all");
   const [sort, setSort] = useState<SortValue>("name");
+  const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const params = new URLSearchParams();
     if (status !== "all") params.set("status", status);
     params.set("sort", sort);
+    if (query.trim()) params.set("q", query.trim());
     setLoading(true);
     void apiFetch<PilotListItem[]>(`/api/pilots?${params.toString()}`)
       .then(setPilots)
       .finally(() => setLoading(false));
-  }, [status, sort]);
+  }, [status, sort, query]);
 
   return (
     <div className="space-y-6 fade-in">
@@ -55,7 +58,14 @@ export default function PilotsPage() {
         </Button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 sm:max-w-md">
+      <div className="grid gap-3 sm:grid-cols-3 sm:max-w-2xl">
+        <Input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Nom ou indicatif"
+          className="min-h-11"
+          aria-label="Rechercher un pilote"
+        />
         <Select
           value={status}
           onValueChange={(value) => setStatus(value as PilotStatus | "all")}

@@ -38,10 +38,26 @@ export default function FlightsPage() {
   const [outcome, setOutcome] = useState<Outcome | "all">("all");
   const [sort, setSort] = useState("date");
   const [page, setPage] = useState(1);
+  const [from, setFrom] = useState<string | null>(null);
+  const [to, setTo] = useState<string | null>(null);
   const [data, setData] = useState<FlightsResponse | null>(null);
   const [importing, setImporting] = useState(false);
   const sortRef = useRef(sort);
   sortRef.current = sort;
+  const keepPilotIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromQ = params.get("from");
+    const toQ = params.get("to");
+    const pilotQ = params.get("pilotId");
+    if (fromQ) setFrom(fromQ);
+    if (toQ) setTo(toQ);
+    if (pilotQ) {
+      keepPilotIdRef.current = pilotQ;
+      setPilotId(pilotQ);
+    }
+  }, []);
 
   useEffect(() => {
     void apiFetch<Squadron[]>("/api/squadrons").then(setSquadrons);
@@ -51,6 +67,14 @@ export default function FlightsPage() {
     const query = squadronId === "all" ? "" : `?squadronId=${squadronId}`;
     void apiFetch<Pilot[]>(`/api/pilots${query}`).then((items) => {
       setPilots(items);
+      const keep = keepPilotIdRef.current;
+      if (keep) {
+        keepPilotIdRef.current = null;
+        if (squadronId === "all" || items.some((pilot) => pilot.id === keep)) {
+          setPilotId(keep);
+          return;
+        }
+      }
       setPilotId("all");
     });
   }, [squadronId]);
@@ -61,12 +85,14 @@ export default function FlightsPage() {
     if (squadronId !== "all") params.set("squadronId", squadronId);
     if (pilotId !== "all") params.set("pilotId", pilotId);
     if (outcome !== "all") params.set("outcome", outcome);
+    if (from) params.set("from", from);
+    if (to) params.set("to", to);
     params.set("sort", sort);
     params.set("page", String(page));
     void apiFetch<FlightsResponse>(`/api/flights?${params.toString()}`).then(
       setData,
     );
-  }, [game, squadronId, pilotId, outcome, sort, page]);
+  }, [game, squadronId, pilotId, outcome, sort, page, from, to]);
 
   const onImport = useCallback(async (file: File): Promise<CsvImportResult> => {
     setImporting(true);
@@ -129,6 +155,34 @@ export default function FlightsPage() {
       </div>
 
       <CsvDropZone onImport={onImport} disabled={importing} />
+
+      {from || to ? (
+        <div className="flex flex-wrap items-center gap-3 text-sm text-ink-secondary">
+          <span>
+            Filtre date : {from ?? "…"} → {to ?? "…"}
+          </span>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              setFrom(null);
+              setTo(null);
+              setPage(1);
+              const params = new URLSearchParams(window.location.search);
+              params.delete("from");
+              params.delete("to");
+              const next = params.toString();
+              window.history.replaceState(
+                null,
+                "",
+                next ? `/flights?${next}` : "/flights",
+              );
+            }}
+          >
+            Effacer les dates
+          </Button>
+        </div>
+      ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Select

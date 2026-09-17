@@ -45,6 +45,21 @@ export const EMPTY_KILLS: KillCounts = {
 /** 1 hour of flight = 1 point (duration stored in minutes). */
 export const POINTS_PER_FLIGHT_HOUR = 1;
 
+/** Successful landing (outcome SUCCESS) = 1 point. */
+export const POINTS_PER_SUCCESS_LANDING = 1;
+
+/** Min flown sorties to appear on the success-rate board. */
+export const SUCCESS_BOARD_MIN_FLIGHTS = 5;
+
+export function killsFromRow(row: KillCounts): KillCounts {
+  return {
+    killsAir: row.killsAir ?? 0,
+    killsNaval: row.killsNaval ?? 0,
+    killsGround: row.killsGround ?? 0,
+    killsBuilding: row.killsBuilding ?? 0,
+  };
+}
+
 export function flightKillPoints(kills: KillCounts): number {
   return KILL_CATEGORIES.reduce(
     (sum, cat) => sum + (kills[cat.key] ?? 0) * cat.points,
@@ -56,11 +71,37 @@ export function flightHourPoints(durationMinutes: number): number {
   return (durationMinutes / 60) * POINTS_PER_FLIGHT_HOUR;
 }
 
+export function flightLandingPoints(outcome?: string | null): number {
+  return outcome === "SUCCESS" ? POINTS_PER_SUCCESS_LANDING : 0;
+}
+
 export function flightTotalPoints(
   kills: KillCounts,
   durationMinutes: number,
+  outcome?: string | null,
 ): number {
-  return flightKillPoints(kills) + flightHourPoints(durationMinutes);
+  return (
+    flightKillPoints(kills) +
+    flightHourPoints(durationMinutes) +
+    flightLandingPoints(outcome)
+  );
+}
+
+/** Career / period totals: kills and hours are linear; landings are per SUCCESS. */
+export function aggregatePoints(
+  kills: KillCounts,
+  durationMinutes: number,
+  successCount: number,
+): number {
+  return (
+    flightKillPoints(kills) +
+    flightHourPoints(durationMinutes) +
+    successCount * POINTS_PER_SUCCESS_LANDING
+  );
+}
+
+export function roundPoints(value: number): number {
+  return Math.round(value * 10) / 10;
 }
 
 export function sumKillCounts(rows: KillCounts[]): KillCounts {
@@ -76,4 +117,4 @@ export function sumKillCounts(rows: KillCounts[]): KillCounts {
 }
 
 export const POINTS_RULES_LABEL =
-  "Aérien 5 · Naval 4 · Sol 3 · Building 2 · 1 h de vol 1";
+  "Aérien 5 · Naval 4 · Sol 3 · Building 2 · 1 h de vol 1 · Atterrissage réussi 1";

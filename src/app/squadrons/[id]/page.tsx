@@ -47,6 +47,7 @@ export default async function SquadronDetailPage({
       select: {
         pilotId: true,
         duration: true,
+        outcome: true,
         killsAir: true,
         killsNaval: true,
         killsGround: true,
@@ -69,6 +70,7 @@ export default async function SquadronDetailPage({
         killsBuilding: flight.killsBuilding,
       },
       flight.duration,
+      flight.outcome,
     );
     pointsByPilot.set(
       flight.pilotId,

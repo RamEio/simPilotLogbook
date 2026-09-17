@@ -37,6 +37,8 @@ export async function GET(request: NextRequest) {
     const squadronId = searchParams.get("squadronId");
     const pilotId = searchParams.get("pilotId");
     const outcome = searchParams.get("outcome");
+    const fromParam = searchParams.get("from");
+    const toParam = searchParams.get("to");
 
     if (game && GAME_VALUES.includes(game as Game)) {
       where.game = game;
@@ -49,6 +51,26 @@ export async function GET(request: NextRequest) {
     }
     if (outcome && OUTCOME_VALUES.includes(outcome as Outcome)) {
       where.outcome = outcome;
+    }
+    const day = /^\d{4}-\d{2}-\d{2}$/;
+    const from =
+      fromParam && day.test(fromParam)
+        ? new Date(`${fromParam}T00:00:00.000Z`)
+        : null;
+    const to =
+      toParam && day.test(toParam)
+        ? new Date(`${toParam}T00:00:00.000Z`)
+        : null;
+    if (from || to) {
+      where.date = {};
+      if (from) {
+        where.date.gte = from;
+      }
+      if (to) {
+        const end = new Date(to);
+        end.setUTCDate(end.getUTCDate() + 1);
+        where.date.lt = end;
+      }
     }
 
     const orderBy: Prisma.FlightOrderByWithRelationInput =

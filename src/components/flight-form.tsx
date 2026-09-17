@@ -34,16 +34,9 @@ import {
   PILOT_STATUSES,
   type PilotStatus,
 } from "@/lib/constants";
+import { LOG_DEFAULTS_KEY, type LogDefaults } from "@/lib/log-defaults";
 import { KILL_CATEGORIES, POINTS_RULES_LABEL, flightTotalPoints } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
-
-const LOG_DEFAULTS_KEY = "spl-log-defaults";
-
-type LogDefaults = {
-  squadronId?: string;
-  pilotId?: string;
-  game?: Game;
-};
 
 type Squadron = { id: string; name: string; tag: string | null };
 type Pilot = {
@@ -496,6 +489,7 @@ export function FlightForm({
       killsBuilding,
     },
     durationToMinutes(hours, minutes),
+    outcome || undefined,
   );
 
   return (

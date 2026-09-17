@@ -81,6 +81,9 @@ export const PILOT_STATUSES: {
   { value: "OUT_OF_ACTION", label: "Hors comb.", short: "H.C." },
 ];
 
+/** System squadron (D-SOLO). Excluded from club leaderboards even before A3 seed. */
+export const SYSTEM_SQUADRON_NAME = "Solo";
+
 export function gameLabel(game: string): string {
   return GAMES.find((item) => item.value === game)?.short ?? game;
 }
