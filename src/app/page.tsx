@@ -213,7 +213,7 @@ export default async function DashboardPage() {
         </CollapsibleCard>
       ) : null}
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid items-start gap-3 sm:grid-cols-2">
         <CollapsibleCard title="Vols">
           <p className="text-display text-ink-primary">{totalFlights}</p>
           <p className="mt-1 text-caption text-ink-muted">

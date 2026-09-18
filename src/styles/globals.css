@@ -238,32 +238,76 @@ body {
 }
 
 .heatcal-scroll {
-  overflow-x: auto;
-  padding-bottom: 0.25rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .heatcal-months {
   display: grid;
   column-gap: 3px;
   margin-bottom: 4px;
-  min-width: max-content;
+  width: 100%;
+}
+
+.heatcal-months span {
+  overflow: visible;
+  white-space: nowrap;
 }
 
 .heatcal-grid {
   display: grid;
   grid-auto-flow: column;
-  grid-template-rows: repeat(7, 0.7rem);
+  grid-template-rows: repeat(7, auto);
   gap: 3px;
-  min-width: max-content;
+  width: 100%;
+}
+
+.heatcal-cell,
+.heatcal-swatch {
+  --heat: var(--status-info);
+  border-radius: 2px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
 }
 
 .heatcal-cell {
   display: block;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  height: auto;
+}
+
+.heatcal-swatch {
+  display: inline-block;
   width: 0.7rem;
   height: 0.7rem;
-  border-radius: 2px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.heatcal-cell[data-game="IL2_GB"],
+.heatcal-swatch[data-game="IL2_GB"] {
+  --heat: var(--amber-500);
+}
+
+.heatcal-cell[data-game="IL2_KOREA"],
+.heatcal-swatch[data-game="IL2_KOREA"] {
+  --heat: var(--red-600);
+}
+
+.heatcal-cell[data-game="DCS"],
+.heatcal-swatch[data-game="DCS"] {
+  --heat: var(--status-info);
+}
+
+.heatcal-cell[data-game="STAR_CITIZEN"],
+.heatcal-swatch[data-game="STAR_CITIZEN"] {
+  --heat: color-mix(in srgb, var(--status-info) 40%, var(--red-600));
+}
+
+.heatcal-cell[data-game="MSFS"],
+.heatcal-swatch[data-game="MSFS"] {
+  --heat: var(--status-success);
 }
 
 .heatcal-out {
@@ -273,21 +317,21 @@ body {
 }
 
 .heatcal-l1 {
-  background: color-mix(in srgb, var(--status-info) 28%, var(--bg-elevated));
-  border-color: color-mix(in srgb, var(--status-info) 35%, var(--border-subtle));
+  background: color-mix(in srgb, var(--heat) 28%, var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--heat) 35%, var(--border-subtle));
 }
 
 .heatcal-l2 {
-  background: color-mix(in srgb, var(--status-info) 48%, var(--bg-elevated));
-  border-color: color-mix(in srgb, var(--status-info) 45%, var(--border-subtle));
+  background: color-mix(in srgb, var(--heat) 48%, var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--heat) 45%, var(--border-subtle));
 }
 
 .heatcal-l3 {
-  background: color-mix(in srgb, var(--status-info) 72%, var(--bg-elevated));
-  border-color: color-mix(in srgb, var(--status-info) 55%, var(--border-subtle));
+  background: color-mix(in srgb, var(--heat) 72%, var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--heat) 55%, var(--border-subtle));
 }
 
 .heatcal-l4 {
-  background: var(--status-info);
-  border-color: var(--status-info);
+  background: var(--heat);
+  border-color: var(--heat);
 }

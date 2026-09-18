@@ -2,7 +2,7 @@
 
 > Suivi des travaux réalisés — Design System Korea v3.0 & évolutions produit  
 > Sources actives : `docs/simpilot_audit.pdf` (p.31–36) · `ASSETS/Designer.md` · parking produit  
-> Dernière mise à jour : **17 septembre 2026** (Lot A + toolbar filtres classements)
+> Dernière mise à jour : **18 septembre 2026** (heatmap pleine largeur + collapse KPI)
 
 ---
 
@@ -22,6 +22,8 @@
 - **SOON** : tout `[x]` (G1/G5, C2–C5, A1, D1–D3, G2/G3/G6, F1, post-save, P-SORT, Lot N + hero)
 - **Lot A (SW-A0–A10)** : livré 17/09 (`bdeb833`) — +1 pt SUCCESS, URL classements, search/highlight, gap, spotlight dernière soirée, heatmap, fiche carrière, board réussite, HoF, Δ rang
 - **SW-A11** : toolbar filtres classements pleine largeur (plus d’orphelin « Actifs »)
+- **SW-A12** : heatmap accueil pleine largeur, teinte par simulateur (heures max du jour), légende intensité + sims
+- **HOME-COLLAPSE** : `CollapsibleCard` replie bien le bloc (KPI Vols / Heures)
 - **Décisions** : D-AUTH C′, D-SOLO, D-N7, **D-SW1 / D-SW2 / D-SW3** tranchés ; D-HERO provisoire (ajustable)
 
 ### Prochain travail recommandé
@@ -168,6 +170,8 @@ Voilà l'analyse IA de ton associé Design !
 | 17/09/2026 | **D-SW1 / D-SW2 / D-SW3 tranchés** : grades FR révocables + hysteresis ; unité stats = Pilote ; SUCCESS = atterri, +1 pt, 5 outcomes conservés |
 | 17/09/2026 | **Lot A livré (SW-A0–A10)** : +1 pt SUCCESS (recalc à la volée), URL classements, search/highlight kiosque, gap rang, spotlight dernière soirée, heatmap club+fiche, barre outcomes / avions / records perso, board réussite (≥5 vols), HoF, Δ rang 30 j./année ; Solo exclu des classements (filtre API, seed A3 plus tard) — commit `bdeb833` |
 | 17/09/2026 | **SW-A11** Toolbar filtres classements : plus à côté du H1 (`flex-wrap` orphelin « Actifs ») ; barre pleine largeur `lg:grid-cols-5` + recherche au-dessus (NN/g H6/H8, Gestalt, Material toolbar, HIG 44px) |
+| 18/09/2026 | **SW-A12** Heatmap club : carrés en `1fr` sur toute la largeur du bloc ; teinte = simulateur (heures max du jour) ; légende intensité + sims |
+| 18/09/2026 | **HOME-COLLAPSE** Collapse KPI accueil : `min-h-0` + `overflow-hidden` sur la carte, `items-start` sur la grille (le stretch CSS gardait le bloc ouvert) |
 
 ---
 
@@ -192,7 +196,7 @@ Voilà l'analyse IA de ton associé Design !
 - [x] Escadrilles (liste + fiche)
 - [x] Leaderboard (période + simulateur + 7 classements : heures / points / réussite / 4 kills ; URL state ; HoF ; spotlight ; toolbar filtres pleine largeur)
 - [x] Scoring : Aérien 5 · Naval 4 · Sol 3 · Building 2 · 1 h = 1 · atterrissage SUCCESS = 1
-- [x] Heatmap activité (accueil + fiche pilote) ; fiche pilote carrière (outcomes, avions, records)
+- [x] Heatmap activité (accueil + fiche pilote, pleine largeur, couleur par sim) ; fiche pilote carrière (outcomes, avions, records)
 - [x] Docker / Apply.Build (`deploiement-apply.build`)
 
 ---
@@ -446,8 +450,11 @@ Source : `docs/sidewinder_classements_pilot_analysis.md`. Hors-scope : grades (L
 | SW-A9 | HoF compact (1 vol + carrière période) | Records cliquables | [x] |
 | SW-A10 | Δ rang vs période précédente (30 j. / année) | ▲▼ sur la row | [x] |
 | SW-A11 | Toolbar filtres pleine largeur (5 cols ≥ lg), recherche au-dessus | Plus d’orphelin « Actifs » ; une ligne de filtres desktop | [x] |
+| SW-A12 | Heatmap pleine largeur + couleur par sim + légende | Carrés = largeur du bloc ; teinte = sim (heures) ; Moins→Plus + pastilles sim | [x] |
+| HOME-COLLAPSE | Chevron Vols / Heures replie le **bloc** | Plus de carte vide à hauteur ouverte | [x] |
 
-- [x] **SW-A0–A11** Lot A classements / fiche / heatmap / toolbar — *17/09/2026*
+- [x] **SW-A0–A12** Lot A classements / fiche / heatmap / toolbar — *17–18/09/2026*
+- [x] **HOME-COLLAPSE** Chevron KPI replie le bloc — *18/09/2026*
 - [x] Exclusion API escadrille **Solo** dans `GET /api/stats/leaderboard` (A3 seed plus tard)
 
 ### LATER — Étendre sans diluer (3–9 mois)
@@ -548,6 +555,10 @@ Source : `docs/sidewinder_classements_pilot_analysis.md`. Hors-scope : grades (L
 - Règle points mise à jour : recalc historique à la volée (`flightTotalPoints` / `aggregatePoints`, rien de stocké)
 - Commit poussé : `bdeb833`
 - **SW-A11 (17/09 PM) :** filtres classements en barre pleine largeur (reco Designer.md : ne plus les coller à droite du H1)
+
+### 18/09/2026 — Heatmap + collapse KPI
+- **SW-A12 :** heatmap pleine largeur du bloc ; teinte = simulateur (le plus d’heures ce jour) ; légende Moins→Plus + pastilles sim
+- **HOME-COLLAPSE :** cartes Vols / Heures — le chevron replie tout le bloc (`min-h-0` + grille `items-start`, plus de stretch CSS)
 
 ---
 

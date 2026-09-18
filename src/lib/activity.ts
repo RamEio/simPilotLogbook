@@ -1,9 +1,11 @@
+import { GAMES, GAME_VALUES, type Game } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 
 export type ActivityCell = {
   date: string;
   flights: number;
   minutes: number;
+  game: Game | null;
 };
 
 export type ActivityCalendar = {
@@ -12,6 +14,7 @@ export type ActivityCalendar = {
   cells: ActivityCell[];
   totals: { activeDays: number; flights: number };
   streak: { current: number; longest: number };
+  usedGames: Game[];
 };
 
 export function toDateKey(date: Date): string {
@@ -54,6 +57,23 @@ function consecutiveStreaks(sortedKeys: string[]): {
   return { current, longest };
 }
 
+function asGame(value: string): Game | null {
+  return GAME_VALUES.includes(value as Game) ? (value as Game) : null;
+}
+
+function dominantGame(minutesByGame: Map<string, number>): Game | null {
+  let best: Game | null = null;
+  let bestMinutes = 0;
+  for (const item of GAMES) {
+    const minutes = minutesByGame.get(item.value) ?? 0;
+    if (minutes > bestMinutes) {
+      best = item.value;
+      bestMinutes = minutes;
+    }
+  }
+  return best;
+}
+
 export async function getActivityCalendar(options?: {
   pilotId?: string;
   days?: number;
@@ -69,27 +89,56 @@ export async function getActivityCalendar(options?: {
       date: { gte: from },
       ...(options?.pilotId ? { pilotId: options.pilotId } : {}),
     },
-    select: { date: true, duration: true },
+    select: { date: true, duration: true, game: true },
   });
 
-  const byDay = new Map<string, ActivityCell>();
+  const byDay = new Map<
+    string,
+    { flights: number; minutes: number; minutesByGame: Map<string, number> }
+  >();
   for (const flight of flights) {
     const key = toDateKey(flight.date);
-    const cell = byDay.get(key) ?? { date: key, flights: 0, minutes: 0 };
+    const cell = byDay.get(key) ?? {
+      flights: 0,
+      minutes: 0,
+      minutesByGame: new Map<string, number>(),
+    };
     cell.flights += 1;
     cell.minutes += flight.duration;
+    const game = asGame(flight.game);
+    if (game) {
+      cell.minutesByGame.set(
+        game,
+        (cell.minutesByGame.get(game) ?? 0) + flight.duration,
+      );
+    }
     byDay.set(key, cell);
   }
 
-  const sortedKeys = Array.from(byDay.keys()).sort();
+  const cells: ActivityCell[] = Array.from(byDay.entries())
+    .map(([date, cell]) => ({
+      date,
+      flights: cell.flights,
+      minutes: cell.minutes,
+      game: dominantGame(cell.minutesByGame),
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const used = new Set(cells.map((cell) => cell.game).filter(Boolean) as Game[]);
+  const usedGames = GAMES.map((item) => item.value).filter((game) =>
+    used.has(game),
+  );
+
+  const sortedKeys = cells.map((cell) => cell.date);
   return {
     from: toDateKey(from),
     to: toDateKey(to),
-    cells: Array.from(byDay.values()).sort((a, b) => a.date.localeCompare(b.date)),
+    cells,
     totals: {
       activeDays: byDay.size,
       flights: flights.length,
     },
     streak: consecutiveStreaks(sortedKeys),
+    usedGames,
   };
 }

@@ -20,7 +20,7 @@ export function CollapsibleCard({
   return (
     <div
       className={cn(
-        "rounded border border-line-subtle bg-bg-card text-ink-primary transition-colors duration-200",
+        "min-h-0 overflow-hidden rounded border border-line-subtle bg-bg-card text-ink-primary transition-colors duration-200",
         className,
       )}
     >
@@ -43,11 +43,11 @@ export function CollapsibleCard({
       </button>
       <div
         className={cn(
-          "grid transition-[grid-template-rows] duration-300 ease-out",
+          "grid min-h-0 transition-[grid-template-rows] duration-300 ease-out",
           open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
         )}
       >
-        <div className="overflow-hidden">
+        <div className="min-h-0 overflow-hidden">
           <div className="space-y-3 px-sp-xl pb-sp-xl">{children}</div>
         </div>
       </div>
