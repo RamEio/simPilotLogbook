@@ -265,7 +265,7 @@ export async function syncPilotGrade(pilotId: string, now = new Date()) {
 }
 
 export async function syncPilotGrades(pilotIds: string[], now = new Date()) {
-  const unique = [...new Set(pilotIds)];
+  const unique = Array.from(new Set(pilotIds));
   const views = new Map<string, GradeView>();
   for (const id of unique) {
     const view = await syncPilotGrade(id, now);

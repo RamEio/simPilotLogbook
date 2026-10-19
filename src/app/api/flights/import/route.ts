@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       touchedPilots.add(pilot.id);
     }
 
-    await syncPilotGrades([...touchedPilots]);
+    await syncPilotGrades(Array.from(touchedPilots));
 
     return NextResponse.json({ created, skipped, total: rows.length });
   } catch (error) {
