@@ -4,7 +4,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CollapsibleCard } from "@/components/collapsible-card";
 import { FlightCard } from "@/components/flight-card";
 import { Button } from "@/components/ui/button";
-import { GAMES } from "@/lib/constants";
+import { GAMES, SYSTEM_SQUADRON_NAME } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { cn, formatCount, formatHours } from "@/lib/utils";
 import { ActivityCalendar } from "@/components/activity-calendar";
@@ -68,7 +68,9 @@ export default async function DashboardPage() {
       orderBy: { _sum: { duration: "desc" } },
       take: 12,
     }),
-    prisma.squadron.count(),
+    prisma.squadron.count({
+      where: { name: { not: SYSTEM_SQUADRON_NAME } },
+    }),
     prisma.pilot.count(),
     prisma.flight.count({ where: { date: { gte: d30 } } }),
     prisma.flight.aggregate({

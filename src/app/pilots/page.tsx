@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { apiFetch } from "@/lib/api";
-import { PILOT_STATUSES, type PilotStatus } from "@/lib/constants";
+import { PILOT_STATUSES, isSystemSquadron, type PilotStatus } from "@/lib/constants";
 
 type PilotListItem = {
   id: string;
@@ -22,6 +22,8 @@ type PilotListItem = {
   callsign: string | null;
   status: string;
   squadron: { name: string; tag: string | null };
+  gradeKey?: string;
+  gradeLabel?: string;
   _count?: { flights: number };
 };
 
@@ -115,7 +117,10 @@ export default function PilotsPage() {
                 callsign: pilot.callsign,
                 status: pilot.status,
                 squadronName: pilot.squadron.tag ?? pilot.squadron.name,
+                systemSquadron: isSystemSquadron(pilot.squadron.name),
                 flightCount: pilot._count?.flights,
+                gradeKey: pilot.gradeKey,
+                gradeLabel: pilot.gradeLabel,
               }}
             />
           ))

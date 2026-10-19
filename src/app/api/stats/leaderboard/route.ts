@@ -4,6 +4,7 @@ import { GAME_VALUES, SYSTEM_SQUADRON_NAME, type Game } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { handleError } from "@/lib/http";
 import { toDateKey } from "@/lib/activity";
+import { syncPilotGrades } from "@/lib/grades";
 import {
   POINTS_RULES_LABEL,
   SUCCESS_BOARD_MIN_FLIGHTS,
@@ -440,16 +441,22 @@ export async function GET(request: NextRequest) {
     const current = accumulate(currentFlights);
     const previous = accumulate(previousFlights);
 
+    const grades = await syncPilotGrades(pilots.map((pilot) => pilot.id));
+
     const pilotRanks = pilots
       .map((pilot) => {
         const agg = current.byPilot.get(pilot.id) ?? emptyAgg();
-        return fromAgg(
-          pilot.id,
-          pilot.name,
-          pilot.callsign,
-          pilot.squadron.tag ?? pilot.squadron.name,
-          agg,
-        );
+        return {
+          ...fromAgg(
+            pilot.id,
+            pilot.name,
+            pilot.callsign,
+            pilot.squadron.tag ?? pilot.squadron.name,
+            agg,
+          ),
+          gradeKey: grades.get(pilot.id)?.key ?? "ASPIRANT",
+          gradeLabel: grades.get(pilot.id)?.label ?? "Aspirant",
+        };
       })
       .filter((pilot) => pilot.flights > 0);
 

@@ -4,16 +4,18 @@ import { ActivityCalendar } from "@/components/activity-calendar";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { FlightCard } from "@/components/flight-card";
 import { PilotEditForm } from "@/components/pilot-edit-form";
+import { SoloBadge } from "@/components/solo-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CollapsibleCard } from "@/components/collapsible-card";
 import { getActivityCalendar } from "@/lib/activity";
-import { OUTCOMES, outcomeMeta, pilotStatusMeta } from "@/lib/constants";
+import { OUTCOMES, isSystemSquadron, outcomeMeta, pilotStatusMeta } from "@/lib/constants";
+import { gradeColor } from "@/components/grade-badge";
+import { gradeCaption, syncPilotGrade } from "@/lib/grades";
 import { prisma } from "@/lib/prisma";
 import {
   KILL_CATEGORIES,
   POINTS_RULES_LABEL,
-  aggregatePoints,
   flightTotalPoints,
   killsFromRow,
   roundPoints,
@@ -65,6 +67,8 @@ export default async function PilotDetailPage({
     notFound();
   }
 
+  const grade = await syncPilotGrade(pilot.id);
+
   const totalFlights = allFlights.length;
   const totalMinutes = allFlights.reduce((sum, flight) => sum + flight.duration, 0);
   const successes = allFlights.filter((flight) => flight.outcome === "SUCCESS").length;
@@ -79,7 +83,12 @@ export default async function PilotDetailPage({
     killsBuilding: allFlights.reduce((sum, flight) => sum + flight.killsBuilding, 0),
   };
   const totalPoints = roundPoints(
-    aggregatePoints(kills, totalMinutes, successes),
+    allFlights.reduce(
+      (sum, flight) =>
+        sum +
+        flightTotalPoints(killsFromRow(flight), flight.duration, flight.outcome),
+      0,
+    ),
   );
 
   const firstFlight = allFlights.at(-1);
@@ -198,6 +207,11 @@ export default async function PilotDetailPage({
               {pilot.squadron.tag ?? pilot.squadron.name}
             </Link>
           </p>
+          {isSystemSquadron(pilot.squadron.name) ? (
+            <div className="mt-2">
+              <SoloBadge />
+            </div>
+          ) : null}
           {firstFlight && lastFlight ? (
             <p className="mt-1 text-caption text-ink-muted">
               Premier vol {formatDate(firstFlight.date)} · Dernier vol{" "}
@@ -216,6 +230,37 @@ export default async function PilotDetailPage({
           {statusMeta.label}
         </Badge>
       </div>
+
+      {grade ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Grade</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p className="text-h3" style={{ color: gradeColor(grade.key) }}>
+              {grade.label}
+            </p>
+            {grade.nextPoints != null ? (
+              <div
+                className="h-2 overflow-hidden rounded bg-bg-hover"
+                role="meter"
+                aria-valuemin={0}
+                aria-valuemax={grade.nextPoints}
+                aria-valuenow={grade.progress}
+                aria-label={gradeCaption(grade)}
+              >
+                <div
+                  className="h-full bg-crimson-600"
+                  style={{
+                    width: `${Math.min(100, (grade.progress / grade.nextPoints) * 100)}%`,
+                  }}
+                />
+              </div>
+            ) : null}
+            <p className="text-caption text-ink-muted">{gradeCaption(grade)}</p>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="grid gap-3 sm:grid-cols-3">
         <Card>
@@ -370,7 +415,7 @@ export default async function PilotDetailPage({
         </section>
       ) : null}
 
-      <CollapsibleCard title="Modifier le statut" defaultOpen={false}>
+      <CollapsibleCard title="Modifier le pilote" defaultOpen={false}>
         <PilotEditForm
           pilot={{
             id: pilot.id,

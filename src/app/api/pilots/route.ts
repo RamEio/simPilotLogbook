@@ -4,11 +4,13 @@ import { z } from "zod";
 import { PILOT_STATUS_VALUES, type PilotStatus } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { handleError, jsonError, toPublicPilot } from "@/lib/http";
+import { gradeLabel } from "@/lib/grades";
+import { ensureSystemSquadron } from "@/lib/solo";
 
 const createPilotSchema = z.object({
   name: z.string().trim().min(1, "Nom requis"),
   callsign: z.string().trim().optional().nullable(),
-  squadronId: z.string().min(1, "Escadrille requise"),
+  squadronId: z.string().trim().min(1).optional(),
   pin: z
     .string()
     .regex(/^\d{4}$/, "PIN : 4 chiffres")
@@ -68,7 +70,12 @@ export async function GET(request: NextRequest) {
       },
       orderBy: pilotOrderBy(sort),
     });
-    return NextResponse.json(pilots.map(toPublicPilot));
+    return NextResponse.json(
+      pilots.map((pilot) => ({
+        ...toPublicPilot(pilot),
+        gradeLabel: gradeLabel(pilot.gradeKey),
+      })),
+    );
   } catch (error) {
     return handleError(error);
   }
@@ -77,9 +84,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = createPilotSchema.parse(await request.json());
-    const squadron = await prisma.squadron.findUnique({
-      where: { id: body.squadronId },
-    });
+    const squadron = body.squadronId
+      ? await prisma.squadron.findUnique({ where: { id: body.squadronId } })
+      : await ensureSystemSquadron();
     if (!squadron) {
       return jsonError("Escadrille introuvable", 404);
     }
@@ -89,7 +96,7 @@ export async function POST(request: NextRequest) {
         name: body.name,
         callsign: body.callsign || undefined,
         pin: body.pin || undefined,
-        squadronId: body.squadronId,
+        squadronId: squadron.id,
       },
       include: { squadron: true },
     });

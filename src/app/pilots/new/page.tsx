@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { apiFetch } from "@/lib/api";
+import { isSystemSquadron, squadronChoiceLabel } from "@/lib/constants";
 
 type Squadron = { id: string; name: string; tag: string | null };
 
@@ -35,7 +36,10 @@ export default function NewPilotPage() {
       setSquadrons(items);
       if (preset && items.some((squadron) => squadron.id === preset)) {
         setSquadronId(preset);
+        return;
       }
+      const solo = items.find((squadron) => isSystemSquadron(squadron.name));
+      if (solo) setSquadronId(solo.id);
     });
   }, []);
 
@@ -112,11 +116,20 @@ export default function NewPilotPage() {
           <SelectContent>
             {squadrons.map((squadron) => (
               <SelectItem key={squadron.id} value={squadron.id}>
-                {squadron.name}
+                {squadronChoiceLabel(squadron)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        {squadrons.some(
+          (squadron) =>
+            squadron.id === squadronId && isSystemSquadron(squadron.name),
+        ) ? (
+          <p className="text-caption text-ink-muted">
+            Par défaut, le pilote est dans Solo et hors classements.
+            Choisissez une escadrille club pour le rattacher.
+          </p>
+        ) : null}
       </div>
       <div className="space-y-2">
         <Button type="submit" className="w-full" disabled={!squadronId}>

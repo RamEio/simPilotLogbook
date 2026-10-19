@@ -3,9 +3,12 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { FlightCard } from "@/components/flight-card";
 import { PilotRow } from "@/components/pilot-row";
+import { SoloBadge } from "@/components/solo-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { isSystemSquadron } from "@/lib/constants";
+import { gradeLabel } from "@/lib/grades";
 import { prisma } from "@/lib/prisma";
 import { flightTotalPoints } from "@/lib/scoring";
 import { formatHours } from "@/lib/utils";
@@ -78,6 +81,8 @@ export default async function SquadronDetailPage({
     );
   }
 
+  const solo = isSystemSquadron(squadron.name);
+
   const topPilots = squadron.pilots
     .map((pilot) => ({
       id: pilot.id,
@@ -103,10 +108,20 @@ export default async function SquadronDetailPage({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="overline overline-amber">Opérations / Escadrille</p>
-          <h1 className="mt-1 text-h1 text-ink-primary">
-            {squadron.tag ? `${squadron.tag} ` : ""}
-            {squadron.name}
-          </h1>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <h1 className="text-h1 text-ink-primary">
+              {squadron.tag ? `${squadron.tag} ` : ""}
+              {squadron.name}
+            </h1>
+            {solo ? <SoloBadge /> : null}
+          </div>
+          {solo ? (
+            <p className="mt-2 max-w-xl text-sm text-ink-secondary">
+              Escadrille système. Ces pilotes ne figurent pas dans les
+              classements club. On peut ensuite rattacher un pilote à une
+              vraie escadrille : les vols déjà saisis restent sur Solo.
+            </p>
+          ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="secondary">
@@ -145,6 +160,7 @@ export default async function SquadronDetailPage({
           </CardContent>
         </Card>
       </div>
+      {solo ? null : (
       <section className="space-y-2">
         <div className="flex items-end justify-between gap-3">
           <h2 className="text-h3 text-ink-primary">Top 3 — points</h2>
@@ -184,6 +200,7 @@ export default async function SquadronDetailPage({
           </ul>
         )}
       </section>
+      )}
       <section className="space-y-2">
         <h2 className="text-h3 text-ink-primary">Pilotes</h2>
         {squadron.pilots.length === 0 ? (
@@ -208,6 +225,9 @@ export default async function SquadronDetailPage({
                     callsign: pilot.callsign,
                     status: pilot.status,
                     squadronName: squadron.tag ?? squadron.name,
+                    systemSquadron: solo,
+                    gradeKey: pilot.gradeKey,
+                    gradeLabel: gradeLabel(pilot.gradeKey),
                   }}
                 />
               </li>

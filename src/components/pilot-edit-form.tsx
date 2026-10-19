@@ -16,6 +16,7 @@ import {
 import { apiFetch } from "@/lib/api";
 import {
   PILOT_STATUSES,
+  squadronChoiceLabel,
   type PilotStatus,
 } from "@/lib/constants";
 
@@ -131,12 +132,15 @@ export function PilotEditForm({
           <SelectContent>
             {squadrons.map((squadron) => (
               <SelectItem key={squadron.id} value={squadron.id}>
-                {squadron.tag ? `${squadron.tag} ` : ""}
-                {squadron.name}
+                {squadronChoiceLabel(squadron)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        <p className="text-caption text-ink-muted">
+          Changer l&apos;escadrille rattache le pilote. Les vols déjà
+          enregistrés restent sur l&apos;escadrille du vol.
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -176,7 +180,7 @@ export function PilotEditForm({
       </div>
 
       <Button type="submit" disabled={saving}>
-        {saving ? "Enregistrement..." : "Enregistrer le statut"}
+        {saving ? "Enregistrement..." : "Enregistrer"}
       </Button>
     </form>
   );

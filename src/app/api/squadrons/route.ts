@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { isReservedSquadronName } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { handleError, jsonError } from "@/lib/http";
+import { ensureSystemSquadron, sortSquadronsForDisplay } from "@/lib/solo";
 
 const createSquadronSchema = z.object({
   name: z.string().trim().min(1, "Nom requis"),
@@ -11,13 +13,13 @@ const createSquadronSchema = z.object({
 
 export async function GET() {
   try {
+    await ensureSystemSquadron();
     const squadrons = await prisma.squadron.findMany({
       include: {
         _count: { select: { pilots: true, flights: true } },
       },
-      orderBy: { name: "asc" },
     });
-    return NextResponse.json(squadrons);
+    return NextResponse.json(sortSquadronsForDisplay(squadrons));
   } catch (error) {
     return handleError(error);
   }
@@ -26,6 +28,9 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = createSquadronSchema.parse(await request.json());
+    if (isReservedSquadronName(body.name)) {
+      return jsonError("Solo est réservé à l'escadrille système", 409);
+    }
     const squadron = await prisma.squadron.create({
       data: {
         name: body.name,

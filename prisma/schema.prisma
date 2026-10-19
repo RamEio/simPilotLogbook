@@ -23,6 +23,10 @@ model Pilot {
   callsign   String?
   pin        String? // optional 4-digit club PIN (never returned by API)
   status     String    @default("ACTIVE") // ACTIVE | OUT_OF_ACTION
+  gradeKey      String    @default("ASPIRANT") // high-water rank, never lowered
+  gradePausedAt DateTime? // set while OUT_OF_ACTION
+  gradePauseMs  Int       @default(0) // time already paused on the open window
+  gradeWindowFrom DateTime? // last flight that opened the current window
   squadronId String
   squadron   Squadron  @relation(fields: [squadronId], references: [id])
   createdAt  DateTime  @default(now())

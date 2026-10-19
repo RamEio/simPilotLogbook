@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { apiFetch } from "@/lib/api";
-import { GAMES, OUTCOMES } from "@/lib/constants";
+import { GAMES, OUTCOMES, squadronChoiceLabel } from "@/lib/constants";
 
 type Squadron = { id: string; name: string; tag: string | null };
 type Pilot = { id: string; name: string; callsign: string | null };
@@ -218,7 +218,7 @@ export default function FlightsPage() {
             <SelectItem value="all">Toutes les escadrilles</SelectItem>
             {squadrons.map((squadron) => (
               <SelectItem key={squadron.id} value={squadron.id}>
-                {squadron.name}
+                {squadronChoiceLabel(squadron)}
               </SelectItem>
             ))}
           </SelectContent>

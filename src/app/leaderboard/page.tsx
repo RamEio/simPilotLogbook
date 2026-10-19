@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { gradeColor } from "@/components/grade-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { apiFetch } from "@/lib/api";
-import { GAMES, type Game } from "@/lib/constants";
+import { GAMES, isSystemSquadron, type Game } from "@/lib/constants";
 import { readLogDefaults } from "@/lib/log-defaults";
 import {
   POINTS_RULES_LABEL,
@@ -38,6 +39,8 @@ type RankRow = {
   killsGround: number;
   killsBuilding: number;
   points: number;
+  gradeKey?: string;
+  gradeLabel?: string;
 };
 
 type RecordItem = {
@@ -448,7 +451,7 @@ function LeaderboardInner() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toutes les escadrilles</SelectItem>
-                {squadronOptions.map((squadron) => (
+                {squadronOptions.filter((squadron) => !isSystemSquadron(squadron.name)).map((squadron) => (
                   <SelectItem key={squadron.id} value={squadron.id}>
                     {squadron.tag
                       ? `${squadron.tag} — ${squadron.name}`
@@ -578,6 +581,14 @@ function LeaderboardInner() {
                         </p>
                         <p className="text-caption text-ink-muted">
                           {pilot.squadronName}
+                          {pilot.gradeLabel ? (
+                            <>
+                              {" · "}
+                              <span style={{ color: gradeColor(pilot.gradeKey) }}>
+                                {pilot.gradeLabel}
+                              </span>
+                            </>
+                          ) : null}
                         </p>
                       </div>
                     </div>

@@ -8,6 +8,7 @@ import {
   type PilotStatus,
 } from "@/lib/constants";
 import { parseCsv, rowsToFlightCsv } from "@/lib/csv";
+import { syncPilotGrades } from "@/lib/grades";
 import { handleError, jsonError } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 
@@ -43,6 +44,7 @@ export async function POST(request: NextRequest) {
     const rows = rowsToFlightCsv(parseCsv(text));
     let created = 0;
     let skipped = 0;
+    const touchedPilots = new Set<string>();
 
     for (const row of rows) {
       if (!GAME_VALUES.includes(row.game as Game)) {
@@ -142,7 +144,10 @@ export async function POST(request: NextRequest) {
         },
       });
       created += 1;
+      touchedPilots.add(pilot.id);
     }
+
+    await syncPilotGrades([...touchedPilots]);
 
     return NextResponse.json({ created, skipped, total: rows.length });
   } catch (error) {

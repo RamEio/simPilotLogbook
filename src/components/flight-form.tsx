@@ -30,6 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { apiFetch } from "@/lib/api";
 import {
   GAME_VALUES,
+  squadronChoiceLabel,
   MISSION_TYPES,
   PILOT_STATUSES,
   type PilotStatus,
@@ -544,8 +545,7 @@ export function FlightForm({
             <SelectContent>
               {squadrons.map((squadron) => (
                 <SelectItem key={squadron.id} value={squadron.id}>
-                  {squadron.tag ? `${squadron.tag} ` : ""}
-                  {squadron.name}
+                  {squadronChoiceLabel(squadron)}
                 </SelectItem>
               ))}
             </SelectContent>

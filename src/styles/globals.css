@@ -31,6 +31,14 @@
   --status-neutral: #64748b;
   --status-badge-opacity: 0.15;
 
+  /* Sequential amber ramp (dark). Higher rank = lighter. Not status colors. */
+  --grade-aspirant: #d1834b;
+  --grade-sous-lieutenant: #e09a46;
+  --grade-lieutenant: #ebae42;
+  --grade-capitaine: #f4c352;
+  --grade-commandant: #fbd26b;
+  --grade-major: #ffe38d;
+
   --text-primary: #ffffff;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
@@ -78,6 +86,14 @@
   --status-error: #dc2626;
   --status-neutral: #64748b;
   --status-badge-opacity: 0.1;
+
+  /* Same amber ramp, darker so small text stays readable on a light card. */
+  --grade-aspirant: #795d3c;
+  --grade-sous-lieutenant: #755321;
+  --grade-lieutenant: #6d4b04;
+  --grade-capitaine: #664200;
+  --grade-commandant: #603900;
+  --grade-major: #563100;
 
   --text-primary: #0f172a;
   --text-secondary: #475569;

@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { GAME_VALUES, OUTCOME_VALUES, type Game, type Outcome } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import { syncPilotGrade } from "@/lib/grades";
 import { flightInclude, handleError, jsonError } from "@/lib/http";
 
 const killCountSchema = z.number().int().min(0).optional().default(0);
@@ -142,6 +143,7 @@ export async function POST(request: NextRequest) {
       },
       include: flightInclude,
     });
+    await syncPilotGrade(body.pilotId);
 
     return NextResponse.json(flight, { status: 201 });
   } catch (error) {

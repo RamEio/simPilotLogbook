@@ -45,8 +45,18 @@ export const EMPTY_KILLS: KillCounts = {
 /** 1 hour of flight = 1 point (duration stored in minutes). */
 export const POINTS_PER_FLIGHT_HOUR = 1;
 
-/** Successful landing (outcome SUCCESS) = 1 point. */
-export const POINTS_PER_SUCCESS_LANDING = 1;
+/**
+ * Applied to (kill points + hour points) for that flight only.
+ * SUCCESS ×1 replaces the old flat +1 landing bonus — do not stack both.
+ * Keys match `OUTCOME_VALUES` in constants.ts.
+ */
+export const OUTCOME_MULTIPLIER = {
+  SUCCESS: 1,
+  PARTIAL_AIRCRAFT: 0.75,
+  PARTIAL_PILOT: 0.5,
+  FAILURE: 0.5,
+  TOTAL_FAILURE: 0.25,
+} as const;
 
 /** Min flown sorties to appear on the success-rate board. */
 export const SUCCESS_BOARD_MIN_FLIGHTS = 5;
@@ -71,8 +81,13 @@ export function flightHourPoints(durationMinutes: number): number {
   return (durationMinutes / 60) * POINTS_PER_FLIGHT_HOUR;
 }
 
-export function flightLandingPoints(outcome?: string | null): number {
-  return outcome === "SUCCESS" ? POINTS_PER_SUCCESS_LANDING : 0;
+/** No outcome yet (live form) counts as full credit until a result is chosen. */
+export function outcomeMultiplier(outcome?: string | null): number {
+  if (!outcome) return OUTCOME_MULTIPLIER.SUCCESS;
+  if (outcome in OUTCOME_MULTIPLIER) {
+    return OUTCOME_MULTIPLIER[outcome as keyof typeof OUTCOME_MULTIPLIER];
+  }
+  return OUTCOME_MULTIPLIER.SUCCESS;
 }
 
 export function flightTotalPoints(
@@ -80,24 +95,8 @@ export function flightTotalPoints(
   durationMinutes: number,
   outcome?: string | null,
 ): number {
-  return (
-    flightKillPoints(kills) +
-    flightHourPoints(durationMinutes) +
-    flightLandingPoints(outcome)
-  );
-}
-
-/** Career / period totals: kills and hours are linear; landings are per SUCCESS. */
-export function aggregatePoints(
-  kills: KillCounts,
-  durationMinutes: number,
-  successCount: number,
-): number {
-  return (
-    flightKillPoints(kills) +
-    flightHourPoints(durationMinutes) +
-    successCount * POINTS_PER_SUCCESS_LANDING
-  );
+  const raw = flightKillPoints(kills) + flightHourPoints(durationMinutes);
+  return roundPoints(raw * outcomeMultiplier(outcome));
 }
 
 export function roundPoints(value: number): number {
@@ -117,4 +116,4 @@ export function sumKillCounts(rows: KillCounts[]): KillCounts {
 }
 
 export const POINTS_RULES_LABEL =
-  "Aérien 5 · Naval 4 · Sol 3 · Building 2 · 1 h de vol 1 · Atterrissage réussi 1";
+  "Aérien 5 · Naval 4 · Sol 3 · Building 2 · 1 h = 1 · Réussite ×1 · Avion détruit ×0,75 · Pilote abattu ×0,5 · Échec ×0,5 · Échec total ×0,25";

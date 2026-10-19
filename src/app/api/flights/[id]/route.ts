@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { GAME_VALUES, OUTCOME_VALUES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import { syncPilotGrade } from "@/lib/grades";
 import { flightInclude, handleError, jsonError } from "@/lib/http";
 
 const killCountSchema = z.number().int().min(0).optional();
@@ -58,6 +59,10 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
       },
       include: flightInclude,
     });
+    await syncPilotGrade(existing.pilotId);
+    if (flight.pilotId !== existing.pilotId) {
+      await syncPilotGrade(flight.pilotId);
+    }
     return NextResponse.json(flight);
   } catch (error) {
     return handleError(error);
@@ -66,7 +71,15 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
 
 export async function DELETE(_request: NextRequest, { params }: RouteContext) {
   try {
+    const existing = await prisma.flight.findUnique({
+      where: { id: params.id },
+      select: { pilotId: true },
+    });
+    if (!existing) {
+      return jsonError("Vol introuvable", 404);
+    }
     await prisma.flight.delete({ where: { id: params.id } });
+    await syncPilotGrade(existing.pilotId);
     return NextResponse.json({ ok: true });
   } catch (error) {
     return handleError(error);

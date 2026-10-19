@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { PILOT_STATUS_VALUES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import { syncPilotGrade } from "@/lib/grades";
 import { handleError, jsonError, toPublicPilot } from "@/lib/http";
 
 const updatePilotSchema = z.object({
@@ -75,6 +76,7 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
       },
       include: { squadron: true },
     });
+    await syncPilotGrade(pilot.id);
 
     return NextResponse.json(toPublicPilot(pilot));
   } catch (error) {

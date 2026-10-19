@@ -154,6 +154,12 @@ const aircraftByGame = {
 };
 
 async function main() {
+  await prisma.squadron.upsert({
+    where: { name: "Solo" },
+    update: {},
+    create: { name: "Solo", icon: "compass" },
+  });
+
   const existing = await prisma.aircraft.count();
   if (existing > 0) {
     return;

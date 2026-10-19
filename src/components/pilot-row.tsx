@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
+import { GradeBadge } from "@/components/grade-badge";
+import { SoloBadge } from "@/components/solo-badge";
 import { Badge } from "@/components/ui/badge";
 import { pilotStatusMeta } from "@/lib/constants";
 import { formatCount } from "@/lib/utils";
@@ -12,7 +14,10 @@ export type PilotRowData = {
   callsign: string | null;
   status: string;
   squadronName: string;
+  systemSquadron?: boolean;
   flightCount?: number;
+  gradeKey?: string;
+  gradeLabel?: string;
 };
 
 function statusBadgeVariant(status: string) {
@@ -49,8 +54,17 @@ export function PilotRow({
           <Badge variant={statusBadgeVariant(pilot.status)}>
             {status.label}
           </Badge>
+          {pilot.gradeLabel ? (
+            <GradeBadge gradeKey={pilot.gradeKey}>{pilot.gradeLabel}</GradeBadge>
+          ) : null}
+          {pilot.systemSquadron ? <SoloBadge /> : null}
         </div>
-        <p className="truncate text-sm text-ink-secondary">
+        <p
+          className={cn(
+            "truncate text-sm",
+            pilot.systemSquadron ? "text-ink-muted" : "text-ink-secondary",
+          )}
+        >
           {pilot.squadronName}
           {typeof pilot.flightCount === "number"
             ? ` · ${formatCount(pilot.flightCount, "vol")}`

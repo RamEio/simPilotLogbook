@@ -2,7 +2,7 @@
 
 > Suivi des travaux réalisés — Design System Korea v3.0 & évolutions produit  
 > Sources actives : `docs/simpilot_audit.pdf` (p.31–36) · `ASSETS/Designer.md` · parking produit  
-> Dernière mise à jour : **18 septembre 2026** (heatmap pleine largeur + collapse KPI)
+> Dernière mise à jour : **19 octobre 2026** (grades : acquis conservé, progression remise à zéro après 30 jours — pas commité)
 
 ---
 
@@ -24,13 +24,15 @@
 - **SW-A11** : toolbar filtres classements pleine largeur (plus d’orphelin « Actifs »)
 - **SW-A12** : heatmap accueil pleine largeur, teinte par simulateur (heures max du jour), légende intensité + sims
 - **HOME-COLLAPSE** : `CollapsibleCard` replie bien le bloc (KPI Vols / Heures)
-- **Décisions** : D-AUTH C′, D-SOLO, D-N7, **D-SW1 / D-SW2 / D-SW3** tranchés ; D-HERO provisoire (ajustable)
+- **Lot S (SW-S0–S6)** : codé 19/10 en local, **pas commité** — (kills + heures) × résultat
+- **A3** : escadrille système Solo (seed + badge + rattach) codée 19/10 en local, **pas commitée**. Un nouveau pilote sans choix d’escadrille est sur Solo. Les pilotes déjà en club restent en club.
+- **Grades (G4 règle)** : codé 19/10 en local, **pas commité**. Grade jamais retiré. Progression vers le suivant remise à zéro après 30 jours sans vol. Hors comb. met le délai en pause. Les points des classements ne changent pas. Le grade est sur les cartes de la liste, avec une échelle ambre progressive (plus le grade est haut, plus la teinte est claire en sombre, plus elle est dense en clair).
+- **Décisions** : D-AUTH C′, D-SOLO, D-N7, **D-SW1 / D-SW2 / D-SW3 / D-SW4** tranchés ; D-HERO provisoire (ajustable)
 
 ### Prochain travail recommandé
-1. **A3** — Escadrille système « Solo » (seed + badge + rattach). L’**exclusion classements** (filtre nom `Solo`) est déjà dans l’API Lot A.
-2. **Lot B / G4** — Grades FR révocables + hysteresis (D-SW1) — pas Lot C (replay / 14 boards).
-3. **H1-impl** — Comptes niveau escadrille (quand besoin SaaS / multi-clubs)
-4. **P-MERGE** — Fusion pilotes (après H1-impl)
+1. **Reste Lot B** — fil de promotions, badges, seuils éditables. La règle de grade est codée (pas l’hysteresis). Pas Lot C (replay / 14 boards).
+2. **H1-impl** — Comptes niveau escadrille (quand besoin SaaS / multi-clubs)
+3. **P-MERGE** — Fusion pilotes (après H1-impl)
 
 ### Hors scope / ne pas committer sans demande
 - Untracked hors Lot A : `ASSETS/prop img 1.png`, `Logbook-missions/`, `docs/benchmark_*`, `docs/simpilot_audit.pdf`, `docs/site_audit_exploration.md`, `.tmp-sw/`
@@ -38,7 +40,7 @@
 - Règle : **pas de commit/push sans accord explicite** du user (Lot A : accord 17/09)
 
 ### Contexte produit court
-Carnet club multi-simulateurs (Next.js 14 + Prisma/SQLite), Korea v3 DS, PIN pilote (pas d’OAuth court terme). Vision : comptes rattachés à l’**escadrille** ; Solo = escadrille système hors classements. Points = kills + heures + **1 pt par atterrissage SUCCESS**.
+Carnet club multi-simulateurs (Next.js 14 + Prisma/SQLite), Korea v3 DS, PIN pilote (pas d’OAuth court terme). Vision : comptes rattachés à l’**escadrille** ; Solo = escadrille système hors classements. Points : (kills + heures) × coefficient du résultat (×1, ×0,75, ×0,5, ×0,5, ×0,25). Codé en local le 19/10, pas encore commité. Le +1 SUCCESS n’est pas cumulé.
 
 ### Fichiers clés
 | Zone | Chemins |
@@ -81,8 +83,8 @@ L’ancienne section « À faire / backlog » a été **absorbée** dedans (pas 
 
 1. Lire **Handoff** + **Journal** (dernières lignes).
 2. Vérifier `git status` / branche `deploiement-apply.build`.
-3. **NOW** et **SOON** (y compris Lot A) sont tout `[x]` → ouvrir **LATER** (A3 seed Solo, puis G4/Lot B).
-4. Vérifier **Décisions** (D-AUTH, D-SOLO, D-SW1/2/3 déjà tranchés ; D-HERO provisoire).
+3. **NOW**, **SOON**, **Lot S**, **A3** et la **règle de grade** sont cochés en local → prochain code = le reste du Lot B (feed, badges), puis H1-impl. Rien de tout cela n’est commité.
+4. Vérifier **Décisions** (D-AUTH, D-SOLO, D-SW1/2/3/4 déjà tranchés ; D-HERO provisoire).
 5. Ne pas committer sans demande user.
 
 ---
@@ -172,6 +174,14 @@ Voilà l'analyse IA de ton associé Design !
 | 17/09/2026 | **SW-A11** Toolbar filtres classements : plus à côté du H1 (`flex-wrap` orphelin « Actifs ») ; barre pleine largeur `lg:grid-cols-5` + recherche au-dessus (NN/g H6/H8, Gestalt, Material toolbar, HIG 44px) |
 | 18/09/2026 | **SW-A12** Heatmap club : carrés en `1fr` sur toute la largeur du bloc ; teinte = simulateur (heures max du jour) ; légende intensité + sims |
 | 18/09/2026 | **HOME-COLLAPSE** Collapse KPI accueil : `min-h-0` + `overflow-hidden` sur la carte, `items-start` sur la grille (le stretch CSS gardait le bloc ouvert) |
+| 19/10/2026 | **Lot S planifié (pas codé)** : D-SW4 — multiplicateur par vol sur (kills + heures). SUCCESS ×1, PARTIAL_AIRCRAFT ×0,75, PARTIAL_PILOT ×0,5. FAILURE ×0,5 et TOTAL_FAILURE ×0,25 d’abord proposés |
+| 19/10/2026 | **D-SW4 tranché** : les cinq coefficients confirmés, y compris `FAILURE` ×0,5 et `TOTAL_FAILURE` ×0,25. Lot S débloqué, toujours pas codé |
+| 19/10/2026 | **Lot S codé (SW-S0–S6), pas commité** : (kills + heures) × coefficient par vol, arrondi au dixième. +1 SUCCESS retiré. Totaux = somme des vols. Board réussite inchangé |
+| 19/10/2026 | **A3 codé, pas commité** : escadrille système Solo (upsert), badge « Hors classements », fiche grisée, pas de top 3 ni filtre classements. Rattach via la fiche pilote ; les vols déjà saisis ne bougent pas |
+| 19/10/2026 | **A3 défaut Solo** : création de pilote sans escadrille choisie → Solo. Depuis une fiche club, le club reste présélectionné. Pilotes déjà en club inchangés |
+| 19/10/2026 | **D-SW1 amendé + règle de grade codée, pas commitée** : grade acquis jamais retiré. Seule la progression vers le suivant revient à 0 après 30 jours sans vol. Hors comb. pause le délai. Points carnet / classements inchangés. Échelle v1 Aspirant 10 · Sous-lieutenant 20 · Lieutenant 30 · Capitaine 40 · Commandant 60 · Major |
+| 19/10/2026 | **Grade sur la liste** : badge de grade sur chaque carte pilote (liste des pilotes et roster d’escadrille) |
+| 19/10/2026 | **Palette de grades** : échelle ambre séquentielle (Aspirant → Major), hors couleurs de statut. Badge liste, nom sur la fiche, mention au classement |
 
 ---
 
@@ -195,7 +205,7 @@ Voilà l'analyse IA de ton associé Design !
 - [x] Pilotes (fiche, statut Actif/Hors comb., PIN)
 - [x] Escadrilles (liste + fiche)
 - [x] Leaderboard (période + simulateur + 7 classements : heures / points / réussite / 4 kills ; URL state ; HoF ; spotlight ; toolbar filtres pleine largeur)
-- [x] Scoring : Aérien 5 · Naval 4 · Sol 3 · Building 2 · 1 h = 1 · atterrissage SUCCESS = 1
+- [x] Scoring : (kills + heures) × résultat — réussite ×1, avion détruit ×0,75, pilote abattu ×0,5, échec ×0,5, échec total ×0,25 *(Lot S, 19/10, pas encore commité)*
 - [x] Heatmap activité (accueil + fiche pilote, pleine largeur, couleur par sim) ; fiche pilote carrière (outcomes, avions, records)
 - [x] Docker / Apply.Build (`deploiement-apply.build`)
 
@@ -212,7 +222,7 @@ Avis Designer : **Garder** / **Adapter** / **Reporter** / **Déjà couvert**
 |---|------------|----------------|------------------|----------|
 | A1 | Checklist onboarding 3 étapes (escadrille → pilote → vol) | ✅ « Premiers pas » dashboard | **Garder** — SOON | NN/g H10 + biais Zeigarnik ; activation club |
 | A2 | Clarifier proposition de valeur hero | 🟡 Hero existe (« Multi-sim flight log ») mais encore anglo + peu CTA | **Adapter** — NOW | Krug : clarifier en FR + CTA explicite, sans landing marketing lourde |
-| A3 | Mode pilote solo (sans escadrille) | 🟡 Exclusion classements API (Lot A) ; seed/badge/rattach pas faits | **Adapter** — LATER (reste A3) | Pseudo-solo ; migration / rattach possible vers une vraie escadrille |
+| A3 | Mode pilote solo (sans escadrille) | ✅ Escadrille système Solo, badge, rattach ; hors classements | **Adapter** — livré 19/10, pas commité | Pseudo-solo ; rattach vers une vraie escadrille |
 
 ### 🏗 Architecture & Navigation
 
@@ -264,7 +274,7 @@ Avis Designer : **Garder** / **Adapter** / **Reporter** / **Déjà couvert**
 | G1 | Filtre escadrille leaderboard | ✅ Select escadrille | **Garder** — SOON haute | Persona 3 ; déjà parking produit |
 | G2 | CTAs contextuels fiche escadrille | ✅ Ajouter pilote + Enregistrer un vol | **Garder** — SOON | Next best action |
 | G3 | Zone drop CSV + feedback états | ✅ Drop zone + états idle/drag/upload/ok/erreur | **Garder** — SOON | Material file upload + H1 |
-| G4 | Grades / jalons (Aspirant → Major) | ⬜ Points existent ; **D-SW1 tranché** (révocable + hysteresis) | **Reporter** — LATER / Lot B | Fort effort ; après boucle rétention Lot A |
+| G4 | Grades / jalons (Aspirant → Major) | 🟡 Règle codée 19/10 (acquis conservé, reset 30 j.) ; feed / badges / seuils éditables restent | **Adapter** — Lot B | Plus d’hysteresis ni de grade révocable |
 | G5 | Filtre statut pilote leaderboard | ✅ Actifs (défaut) / Tous | **Garder** — SOON | Cohérent avec G1 |
 | G6 | PilotCard / PilotRow unique | ✅ `PilotRow` listes pilotes + fiche escadrille | **Garder** — SOON | Cohérence visuelle DS |
 | P-SORT | Filtre/tri liste pilotes | ✅ Statut + tri nom / createdAt / statut | **Garder** — ajout produit 01/09 | Parité UX avec liste vols |
@@ -455,7 +465,40 @@ Source : `docs/sidewinder_classements_pilot_analysis.md`. Hors-scope : grades (L
 
 - [x] **SW-A0–A12** Lot A classements / fiche / heatmap / toolbar — *17–18/09/2026*
 - [x] **HOME-COLLAPSE** Chevron KPI replie le bloc — *18/09/2026*
-- [x] Exclusion API escadrille **Solo** dans `GET /api/stats/leaderboard` (A3 seed plus tard)
+- [x] Exclusion API escadrille **Solo** dans `GET /api/stats/leaderboard`
+- [x] **A3** Escadrille système Solo — seed, badge, rattach *(codé 19/10, pas commité)*
+
+#### Lot S — Multiplicateur selon le résultat — *codé 19/10/2026, pas commité*
+
+**Problème :** kills et heures comptent plein pot quel que soit le résultat. Le +1 SUCCESS (D-SW3) ne sépare presque pas une réussite d’un crash.
+
+**Règle :** `(points kills + points heures) × multiplicateur du vol`. Rien n’est stocké : `flightTotalPoints` recalcule, comme au Lot A. Le +1 atterrissage est **retiré** (le ×1 le remplace ; ne pas cumuler les deux).
+
+**Pourquoi par vol :** un coefficient différent par sortie n’est pas linéaire. Sommer les kills du mois puis multiplier une fois fausse le total. `aggregatePoints` (fiche pilote) fait aujourd’hui cette somme brute : il doit devenir une somme de `flightTotalPoints`.
+
+| Résultat | Sens (briefing) | Coefficient | Statut |
+|----------|-----------------|-------------|--------|
+| `SUCCESS` | Réussite totale | ×1 | **Tranché** 19/10 |
+| `PARTIAL_AIRCRAFT` | Réussite partielle — avion détruit | ×0,75 | **Tranché** 19/10 |
+| `PARTIAL_PILOT` | Réussite partielle — pilote abattu | ×0,5 | **Tranché** 19/10 |
+| `FAILURE` | Échec — objectif non atteint, pas de perte déclarée | ×0,5 | **Tranché** 19/10 |
+| `TOTAL_FAILURE` | Échec total — objectif non atteint + avion ou pilote perdu | ×0,25 | **Tranché** 19/10 |
+
+Les cinq coefficients sont confirmés. `FAILURE` et `TOTAL_FAILURE` prolongent l’échelle : un échec total reste en dessous d’un pilote abattu, sans annuler toute la sortie.
+
+| ID | Tâche | Succès | Statut |
+|----|--------|--------|--------|
+| SW-S0 | `OUTCOME_MULTIPLIER` dans `src/lib/scoring.ts` ; `flightTotalPoints` = (kills + heures) × coeff ; retirer `flightLandingPoints` du total | Vol à 40 pts bruts : SUCCESS 40 · avion détruit 30 · pilote abattu 20 · échec 20 · échec total 10 | [x] |
+| SW-S1 | Totaux carrière : somme par vol, plus `aggregatePoints(kills, heures, nb SUCCESS)` | Fiche pilote = somme des vols déjà affichés au détail | [x] |
+| SW-S2 | `POINTS_RULES_LABEL` (formulaire, classements, fiche) | La phrase décrit les coefficients, plus le +1 | [x] |
+| SW-S3 | Score live du formulaire (D2) suit le résultat choisi | Changer le résultat sur `/log` change l’estimation | [x] |
+| SW-S4 | Vérifier classements points, HoF, spotlight, fiche escadrille : tous passent par `flightTotalPoints` | Même vol, même total partout | [x] |
+| SW-S5 | Board réussite (taux de `SUCCESS`, seuil 5 vols) **inchangé** | Le % réussite ne devient pas un coefficient | [x] |
+| SW-S6 | Garder `roundPoints` au dixième **après** multiplication | Pas de migration ; 3,75 s’affiche 3,8 (arrondi déjà en place) | [x] |
+
+**Hors scope Lot S :** nouveaux résultats, malus fixe en plus du coefficient, grades (G4 / Lot B), recalcul stocké en base.
+
+- [x] **SW-S0–S6** Lot S — multiplicateur de résultat *(codé 19/10, pas commité)*
 
 ### LATER — Étendre sans diluer (3–9 mois)
 
@@ -478,10 +521,12 @@ Source : `docs/sidewinder_classements_pilot_analysis.md`. Hors-scope : grades (L
 
 - [x] **H1** Décision documentée D-AUTH C′ — *01/09/2026* *(impl. auth escadrille = lot futur)*
 - [x] **D-SOLO** Décision documentée — escadrille système Solo hors classements — *01/09/2026*
-- [ ] **A3** Impl. support Solo (seed + UI badge + rattach) — *exclusion classements déjà Lot A*
+- [x] **Lot S** Multiplicateur de résultat (D-SW4) — codé 19/10, pas commité
+- [x] **A3** Impl. support Solo (seed + UI badge + rattach) — *codé 19/10, pas commité*
 - [ ] **H1-impl** Comptes au niveau escadrille (quand le besoin multi-clubs / SaaS se présente)
 - [ ] **P-MERGE** Fusionner deux pilotes (doublons) — **uniquement si connecté** (après H1-impl) ; réaffecter vols / kills / points vers le pilote cible, supprimer ou archiver la source
-- [ ] **G4** Grades / jalons configurables — **D-SW1** : FR Aspirant→Major, révocable, hysteresis (Lot B)
+- [x] **G4-règle** Grade jamais retiré ; progression vers le suivant remise à zéro après 30 jours sans vol ; Hors comb. pause le délai ; fiche, liste des pilotes et mention au classement ; échelle ambre progressive — *codé 19/10, pas commité*
+- [ ] **G4-reste** Fil de promotions, badges, seuils éditables (l’échelle v1 est dans `src/lib/grades.ts`)
 - [ ] **F2** Log mobile rapide 3 champs
 - [ ] **I1** Collecteur local DCS/IL-2
 - [ ] **I2** Escadrille publique partageable *(après H1-impl)*
@@ -497,9 +542,10 @@ Source : `docs/sidewinder_classements_pilot_analysis.md`. Hors-scope : grades (L
 | D-SOLO | Autoriser pilote sans escadrille ? | A3 | **Tranché** — escadrille système « Solo » ; hors classements ; rattach possible (*01/09/2026*) |
 | D-HERO | Accroche FR exacte + CTA | A2 | **Tranché provisoire** — « Carnet multi-simulateurs » + CTA « Enregistrer un vol » (ajustable) |
 | D-N7 | Quand sauver le statut pendant une sortie ? | Lot N | **Tranché** — immédiat (API dès le contrôle, pas au submit du vol) |
-| D-SW1 | Grades Sidewinder-like ? | G4 / Lot B | **Tranché 17/09** — échelle FR Aspirant→Major, **révocable**, hysteresis |
-| D-SW2 | Unité stats = User ou Pilot ? | G4, H1-impl | **Tranché 17/09** — Temps 1 = **Pilote** ; Temps 2 H1-impl agrège ; Hors comb. = grade gelé |
-| D-SW3 | Mapping outcomes / Landed / death ? | Scoring, fiche | **Tranché 17/09** — 5 outcomes conservés ; SUCCESS = atterri ; +1 pt SUCCESS ; pas de pénalité death/capture |
+| D-SW1 | Grades Sidewinder-like ? | G4 / Lot B | **Amendé 19/10** — échelle FR Aspirant→Major, **jamais retiré**. La progression vers le grade suivant revient à 0 après **30 jours** sans vol. Hors comb. **pause** ce délai. Les points du carnet et des classements ne sont pas remis à zéro. Plus d’hysteresis |
+| D-SW2 | Unité stats = User ou Pilot ? | G4, H1-impl | **Tranché 17/09, précisé 19/10** — Temps 1 = **Pilote**. Hors comb. = le délai de 30 jours est en pause (le grade ne redescend pas, la progression non plus) |
+| D-SW3 | Mapping outcomes / Landed / death ? | Scoring, fiche | **Tranché 17/09, amendé 19/10** — 5 outcomes conservés ; SUCCESS = atterri. Le +1 pt SUCCESS est **remplacé** par le multiplicateur D-SW4 (pas cumulé). Pas de malus fixe en plus du coefficient |
+| D-SW4 | Coefficient de points selon le résultat | Scoring, classements, fiche, score live | **Tranché 19/10** — SUCCESS ×1, avion détruit ×0,75, pilote abattu ×0,5, échec ×0,5, échec total ×0,25. S’applique aux kills + heures, par vol. Le +1 SUCCESS n’est pas cumulé |
 
 ---
 
@@ -559,6 +605,20 @@ Source : `docs/sidewinder_classements_pilot_analysis.md`. Hors-scope : grades (L
 ### 18/09/2026 — Heatmap + collapse KPI
 - **SW-A12 :** heatmap pleine largeur du bloc ; teinte = simulateur (le plus d’heures ce jour) ; légende Moins→Plus + pastilles sim
 - **HOME-COLLAPSE :** cartes Vols / Heures — le chevron replie tout le bloc (`min-h-0` + grille `items-start`, plus de stretch CSS)
+
+### 19/10/2026 — Lot S planifié (multiplicateur de résultat)
+- Un crash rapporte aujourd’hui les mêmes kills + heures qu’une réussite ; le +1 SUCCESS ne corrige presque pas l’écart
+- **D-SW4 :** (kills + heures) × coefficient **par vol**, recalc à la volée, rien en base
+- **D-SW4 tranché** : SUCCESS ×1 · `PARTIAL_AIRCRAFT` ×0,75 · `PARTIAL_PILOT` ×0,5 · `FAILURE` ×0,5 · `TOTAL_FAILURE` ×0,25
+- Le +1 D-SW3 est retiré au moment du code, pas ajouté au coefficient
+- Board réussite (taux) hors scope
+- **Pas commité** — barème en place dans `src/lib/scoring.ts` ; totaux recalculés à la volée
+
+### 19/10/2026 — Lot S codé (pas commité)
+- `flightTotalPoints` = (kills + heures) × coefficient, arrondi au dixième
+- Fiche pilote : somme de chaque vol (plus de total brut + bonus SUCCESS)
+- Phrase de règle mise à jour sur le formulaire, les classements et la fiche
+- Classement réussite (taux, seuil 5 vols) inchangé
 
 ---
 
